@@ -4,7 +4,7 @@ Consiste em uma aplicação web para criação, consultas e gerenciamento de reg
 As principais tecnologias utilizadas são os frameworks Django (5.1.2) e Bootstrap (5.3.3).
 
 ## Execução em Linux
-- Faca download e extracao dos arquivos
+- Faça download e extração dos arquivos
 - Acesse a pasta pelo terminal e execute os seguintes comandos:
      - python3 -m venv .venv
      - source .venv/bin/activate
