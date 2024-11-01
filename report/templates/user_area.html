@@ -3,48 +3,50 @@
 {% block content %}
 
 <main class="container py-5 mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-
-            <h2 class="text-center">Ocorrências não Finalizadas</h2>
-
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th class="text-center">NE</th>
-                        <th class="text-center">Nome do solicitante</th>
-                        <th class="text-center">Telefone</th>
-                        <th class="text-center">Endereço</th>
-                        <th class="text-center">É Parte da Ocorrência</th>
-                        <th class="text-center">Está esperando?</th>
-                        <th class="text-center">Data/Hora da Ocorrência</th>
-                        <th class="text-center">Data da Chamada</th>
-                        <th class="text-center">Atendente</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in records %}
-                        <tr>
-                            <td class="text-center">{{ record.ne }}</td>
-                            <td class="text-center">{{ record.caller_name }}</td>
-                            <td class="text-center">{{ record.caller_phone }}</td>
-                            <td class="text-center">{{ record.caller_address }}</td>
-                            <td class="text-center">{{ record.is_caller_part_of|yesno:"Sim,Não" }}</td>
-                            <td class="text-center">{{ record.is_caller_wating|yesno:"Sim,Não" }}</td>
-                            <td class="text-center">{{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</td>
-                            <td class="text-center">{{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</td>
-                            <td class="text-center">{{ record.user.username }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="8" class="text-center">Nenhum registro criado hoje.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
+    <h2 class="text-center">Ocorrências não Despachadas:</h2>
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <div class="accordion" id="accordionExample">
+                {% for record in records %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}">
+                            NE: {{ record.ne }} <span class="mx-4">|</span> Solicitante: {{ record.caller_name }} <span class="mx-4">|</span> Local: {{ record.caller_address }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <ul class="list-unstyled">
+                                <li><strong>Telefone:</strong> {{ record.caller_phone }}</li>
+                                <li><strong>Endereço:</strong> {{ record.caller_address }}</li>
+                                <li><strong>É Parte da Ocorrência?</strong> {{ record.is_caller_part_of|yesno:"Sim,Não" }}</li>
+                                <li><strong>Está esperando?</strong> {{ record.is_caller_wating|yesno:"Sim,Não" }}</li>
+                                <li><strong>Data/Hora do Fato:</strong> {{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</li>
+                                <li><strong>Data/Hora da Chamada:</strong> {{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</li>
+                                <li><strong>Atendente:</strong> {{ record.user.username }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNoRecords" aria-expanded="true" aria-controls="collapseNoRecords">
+                            Nenhum registro criado hoje.
+                        </button>
+                    </h2>
+                    <div id="collapseNoRecords" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            Não há ocorrências não despachadas.
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
+
+    <h2 class="text-center">Ocorrências em Atendimento:</h2>
 </main>
 
 {% endblock %}

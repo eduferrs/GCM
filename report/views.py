@@ -77,7 +77,7 @@ def sair(request):
 
 
 
-##################################################### CRIAÇÃO DE REGISTRO
+##################################################################### CRIAÇÃO DE REGISTRO
 @login_required
 def create_record(request):
     if request.method == 'GET':                         #continua no formulário se tentar uma requisição for do tipo GET
@@ -88,30 +88,40 @@ def create_record(request):
 
         try:                                    #salva se estiver tudo ok
             form = RecordForm(request.POST)
-            new_task = form.save(commit=False)
-            new_task.user = request.user
-            new_task.is_caller_part_of = 'is_caller_part_of' in request.POST
-            new_task.is_caller_wating = 'is_caller_wating' in request.POST
-            new_task.call_date = timezone.now()
-            new_task.save()
+            new_record = form.save(commit=False)
+            new_record.user = request.user
+            if not new_record.caller_name:
+                new_record.caller_name = "Não Informado"
+            if not new_record.caller_phone:
+                new_record.caller_phone = "Não Informado"
+            new_record.is_caller_part_of = 'is_caller_part_of' in request.POST
+            new_record.is_caller_wating = 'is_caller_wating' in request.POST
+            new_record.call_date = timezone.now()
+            new_record.save()
             return render(request, 'create_record.html', {
                 'form' : RecordForm,
                 'success' : 'Registro criado com sucesso!'
             })
-            #return redirect('user_area')
         
         except ValueError:                      
             return render(request, 'create_record.html', {
                 'form' : RecordForm,
-                'error' : 'Erro ao registrar! Algum campo não foi preenchido corretamente (ex.: NE já existente)'})
+                'error' : 'Erro ao registrar! Algum campo não foi preenchido corretamente'})
 
-######################################################################### Consultas
+
+
+
+############################################################################################# Consultas
 @login_required
 def today_records(request):
     today = timezone.now().date()
     records = Record.objects.filter(call_date__date=today)
     return render(request, 'today_records.html', {'records': records})
 
+@login_required
+def all_records(request):
+    records = Record.objects.all()
+    return render(request, 'all_records.html', {'records': records})
 
 
 ######################################################################## EXPORTAÇÕES

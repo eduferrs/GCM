@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from report.views import home, signin, signup, sair, user_area, create_record, today_records, export_records_csv, export_records_excel
+from report.views import home, signin, signup, sair, user_area, create_record, all_records, today_records, export_records_csv, export_records_excel
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +30,7 @@ urlpatterns = [
 
 
     path('today_records/', today_records, name='today_records'),
+    path('all_records/', all_records, name='all_records'),
 
     path('export/csv/', export_records_csv, name='export_records_csv'),
     path('export/excel/', export_records_excel, name='export_records_excel'),

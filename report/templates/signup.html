@@ -2,11 +2,10 @@
 
 {% block content %}
 
-<main class="container py-5 mt-5">
-    <div class="row">
-        <div class="col-md-5 offset-md-3">
+<main class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="row w-100">
+        <div class="col-md-5 mx-auto">
             <form method="POST" class="card card-body">
-
                 
                 {% csrf_token %}
                 <h1 class="text-center">Cadastro</h1>
@@ -34,6 +33,4 @@
     </div>
 </main>
 
-
 {% endblock %}
-
