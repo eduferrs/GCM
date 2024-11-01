@@ -1,6 +1,5 @@
 ## Sobre
-Este é um projeto em desenvolvimento para a Guarda Civil de São Vicente. 
-Consiste em uma aplicação web para criação, consultas e gerenciamento de registros de ocorrências.
+Projeto em desenvolvimento que consiste em uma aplicação web para criação, consultas e gerenciamento de registros de ocorrências policiais.
 As principais tecnologias utilizadas são os frameworks Django (5.1.2) e Bootstrap (5.3.3).
 
 ## Execução em Linux
