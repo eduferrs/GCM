@@ -1,0 +1,55 @@
+{% extends "menu.html" %}
+
+{% block content %}
+
+<main class="container py-5 mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+
+            <h2 class="text-center">Ocorrências de Hoje</h2>
+
+            <div class="card card-body">
+                <a href="{% url 'export_records_csv' %}" class="btn btn-primary mb-3">Exportar em csv</a>
+                <a href="{% url 'export_records_excel' %}" class="btn btn-success">Exportar em xlsx</a>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center">NE</th>
+                        <th class="text-center">Nome do solicitante</th>
+                        <th class="text-center">Telefone</th>
+                        <th class="text-center">Endereço</th>
+                        <th class="text-center">É Parte da Ocorrência</th>
+                        <th class="text-center">Está esperando?</th>
+                        <th class="text-center">Data/Hora da Ocorrência</th>
+                        <th class="text-center">Data da Chamada</th>
+                        <th class="text-center">Atendente</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                        <tr>
+                            <td class="text-center">{{ record.ne }}</td>
+                            <td class="text-center">{{ record.caller_name }}</td>
+                            <td class="text-center">{{ record.caller_phone }}</td>
+                            <td class="text-center">{{ record.caller_address }}</td>
+                            <td class="text-center">{{ record.is_caller_part_of|yesno:"Sim,Não" }}</td>
+                            <td class="text-center">{{ record.is_caller_wating|yesno:"Sim,Não" }}</td>
+                            <td class="text-center">{{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</td>
+                            <td class="text-center">{{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</td>
+                            <td class="text-center">{{ record.user.username }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Nenhum registro criado hoje.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</main>
+
+{% endblock %}
