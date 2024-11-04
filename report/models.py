@@ -3,6 +3,21 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 
 
+#Atributos do User padrão (já vem criado com o Django). 
+##Atualmente apenas username e password estão sendo utilizados para o cadastro.
+###is_active é definido como True automaticamente ao realizar um cadastro.
+
+#username: Único. Pode ser utilizado para login.
+#first_name: Opcional.
+#last_name: Opcional.
+#email: Opcional, mas pode ser configurado como obrigatório e usado para login.
+#password: Armazenada com criptografia.
+#is_staff: Boolean para indicar se o usuário pode acessar o painel de administrador.
+#is_active: Boolean. Usuários inativos não podem fazer login.
+#is_superuser: Boolean para indicar usuários que possuem todas as permissões.
+#last_login: Armazena data e hora do ultimo login.
+#date_joined: Armazena data e hora do cadastro.
+
 
 # Create your models here.
 class Record(models.Model):
