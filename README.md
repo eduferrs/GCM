@@ -28,6 +28,7 @@ As principais tecnologias utilizadas são os frameworks Django (5.1.2) e Bootstr
 - No navegador, acesse o endereço http://127.0.0.1:8000/
 - Ao terminar de utilizar, aperte Ctrl + C no terminal e execute o comando deactivate
 
+
 *Note que, ao extrair, pode ser que duas pastas com o mesmo nome sejam criadas. O caminho correto para a execução dos comandos seria algo como C:\Users\nome\Downloads\GCM-main\GCM-main
 
 
