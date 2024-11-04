@@ -12,7 +12,7 @@ As principais tecnologias utilizadas são os frameworks Django (5.1.2) e Bootstr
      - python3 manage.py migrate
      - python3 manage.py runserver
 - No navegador, acesse o endereço http://127.0.0.1:8000/
-- Execute deactivate no terminal quando terminar de utilizar.
+- Ao terminar de utilizar, aperte Ctrl + C no terminal e execute o comando deactivate
 
 
 ## Execução em Windows
@@ -20,12 +20,12 @@ As principais tecnologias utilizadas são os frameworks Django (5.1.2) e Bootstr
 - Faca download e extração dos arquivos deste repositório
 - Acesse a pasta pelo terminal e execute os seguintes comandos:
 	- python -m venv venv
-	- .\scripts\activate
+	- .\venv\scripts\activate
 	- pip install -r requeriments.txt
 	- python manage.py makemigrations
 	- python manage.py migrate
 	- python manage.py runserver
 - No navegador, acesse o endereço http://127.0.0.1:8000/
-- Execute deactivate no terminal quando terminar de utilizar.
+- Ao terminar de utilizar, aperte Ctrl + C no terminal e execute o comando deactivate
 
 
