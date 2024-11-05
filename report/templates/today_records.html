@@ -16,7 +16,6 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center">NE</th>
                         <th class="text-center">Nome do solicitante</th>
                         <th class="text-center">Telefone</th>
                         <th class="text-center">Endereço</th>
@@ -24,13 +23,13 @@
                         <th class="text-center">Está esperando?</th>
                         <th class="text-center">Data/Hora da Ocorrência</th>
                         <th class="text-center">Data da Chamada</th>
-                        <th class="text-center">Atendente</th>
+                        <th class="text-center">Plantonista</th>
+                        <th class="text-center">RE</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in records %}
                         <tr>
-                            <td class="text-center">{{ record.ne }}</td>
                             <td class="text-center">{{ record.caller_name }}</td>
                             <td class="text-center">{{ record.caller_phone }}</td>
                             <td class="text-center">{{ record.caller_address }}</td>
@@ -38,7 +37,8 @@
                             <td class="text-center">{{ record.is_caller_wating|yesno:"Sim,Não" }}</td>
                             <td class="text-center">{{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</td>
                             <td class="text-center">{{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</td>
-                            <td class="text-center">{{ record.user.username }}</td>
+                            <td class="text-center">{{ record.user.first_name }}</td>
+                            <td class="text-center">{{ user.profile.re }}</td>
                         </tr>
                     {% empty %}
                         <tr>

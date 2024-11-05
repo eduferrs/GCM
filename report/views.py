@@ -1,6 +1,9 @@
-from django.shortcuts import render
 import csv
+import re
+from .forms import RecordForm
+from .models import Record, Profile
 from openpyxl import Workbook
+from datetime import timedelta
 from django.http import HttpResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,8 +11,6 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .forms import RecordForm
-from .models import Record
 
 
 
@@ -20,54 +21,84 @@ def home(request):
 ################################################## LOGIN
 def signup(request):
     if request.method == 'GET':
-        return render(request, 'signup.html', {
-            'form' : UserCreationForm 
-        })
+        return render(request, 'signup.html')
+    
     else:
-        if request.POST['password1'] == request.POST['password2']:
+        # Verifique se a senha e o email são confirmados corretamente
+        if request.POST['password1'] == request.POST['password2'] and request.POST['email'] == request.POST['email_confirm']:
+
+            if not re.fullmatch(r'\d+', request.POST['re']):
+                return render(request, 'signup.html', {
+                    "error": "O RE deve conter apenas números!"
+                })
 
             try:
-                user = User.objects.create_user(username=request.POST['username'], password=request.POST['password1'])
+                user = User.objects.create_user(
+                    username=request.POST['username'],
+                    password=request.POST['password1'],
+                    first_name=request.POST['first_name'],
+                    last_name=request.POST['last_name'],
+                    email=request.POST['email'],
+                    is_active=False
+                )
                 user.save()
 
-                #login(request, user)
-                #return redirect('user_area')
+                profile = Profile.objects.create(
+                    user=user,                      #associando user com profile
+                    re=request.POST['re']
+                )
+                profile.save()
+
                 return render(request, 'signin.html', {
-                    'user_created' : 'Usuário criado com sucesso! Faça o login.'
+                    'user_created': 'Usuário criado com sucesso! É necessário que o administrador forneça permissão antes de acessar.'
                 })
             
             except:
                 return render(request, 'signup.html', {
-                'form' : UserCreationForm, 
-                "error": 'O nome de usuário já existe'
+                    "error": "Erro ao criar usuário! Nome de usuário ou RE já existe."
                 })
+
         return render(request, 'signup.html', {
-            'form': UserCreationForm, 
-            "error": 'Senhas divergentes!'
+            "error": "Senhas ou e-mails divergentes!"
         })
 
 def signin(request):
     if request.method == 'GET':
         return render(request, 'signin.html', {
-            'form' : AuthenticationForm
+            'form': AuthenticationForm
         })
+    
     else:
-        user = authenticate(
-            request, username=request.POST['username'], password=request.POST['password'])
+        username_or_email = request.POST['username']
+        password = request.POST['password']
+        
+        try:
+            user = User.objects.get(email=username_or_email)
+            username = user.username
+        except User.DoesNotExist:
+            username = username_or_email
+        
+        try:
+            user = User.objects.get(username=username)
+            if not user.is_active:
+                return render(request, 'signin.html', {
+                    'form': AuthenticationForm,
+                    'error': 'Usuário sem permissão de acesso! Contate o administrador.'
+                })
+        except User.DoesNotExist:
+            pass 
+        
+        user = authenticate(request, username=username, password=password)
+        
         if user is None:
             return render(request, 'signin.html', {
-                'form' : AuthenticationForm,
+                'form': AuthenticationForm,
                 'error': 'Usuário e/ou senha incorreto(s)'
             })
         else:
             login(request, user)
             return redirect('user_area')
-        
-@login_required
-def user_area(request):
-    today = timezone.now().date()
-    records = Record.objects.filter(call_date__date=today)
-    return render(request, 'user_area.html', {'records': records})
+
 
 
 @login_required
@@ -75,6 +106,16 @@ def sair(request):
     logout(request)
     return redirect('home')
 
+
+#################################################################### REGISTROS EXIBIDOS NA user_area.html
+@login_required
+def user_area(request):
+    today = timezone.now()
+    start_of_day = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_day = today.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+    records = Record.objects.filter(call_date__range=(start_of_day, end_of_day))
+    return render(request, 'user_area.html', {'records': records})
 
 
 ##################################################################### CRIAÇÃO DE REGISTRO
@@ -114,8 +155,11 @@ def create_record(request):
 ############################################################################################# Consultas
 @login_required
 def today_records(request):
-    today = timezone.now().date()
-    records = Record.objects.filter(call_date__date=today)
+    today = timezone.now()
+    start_of_day = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_day = today.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+    records = Record.objects.filter(call_date__range=(start_of_day, end_of_day))
     return render(request, 'today_records.html', {'records': records})
 
 @login_required
@@ -199,7 +243,7 @@ def export_records_excel(request):
         record.is_caller_wating = 'Sim' if record.is_caller_wating else 'Não'
 
         ###Formatação das datas
-        #replace(tzinfo=None) é para remoção do fuso horário desse campo. Dava erro com ele
+        #replace(tzinfo=None) é para remoção do fuso horário desse campo.
         if record.fact_date:
             fact_date = record.fact_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
         else:

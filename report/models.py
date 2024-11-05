@@ -18,11 +18,16 @@ from django.core.validators import MaxValueValidator
 #last_login: Armazena data e hora do ultimo login.
 #date_joined: Armazena data e hora do cadastro.
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    re = models.CharField(unique=True, max_length=12)
+    
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name} - NE: {self.tipo_usuario} - NUSP: {self.nusp}"
 
-# Create your models here.
+
 class Record(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    ne = models.IntegerField(unique=True, validators=[MaxValueValidator(99999999999)])
     caller_name = models.CharField(max_length=100, blank=True, default="Não Informado") 
     caller_phone = models.CharField(max_length=15, blank=True, default="Não Informado")
     caller_address = models.CharField(max_length=150, blank=True)

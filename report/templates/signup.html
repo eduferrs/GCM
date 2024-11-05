@@ -10,19 +10,48 @@
                 {% csrf_token %}
                 <h1 class="text-center">Cadastro</h1>
 
-                <div class="mb-3">
-                    <label for="username" class="form-label">Nome de usuário</label>
-                    <input type="text" class="form-control" name="username">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Nome de usuário</label>
+                        <input type="text" class="form-control" name="username" placeholder="Utilizado para o login" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="re" class="form-label">RE</label>
+                        <input type="text" class="form-control" name="re" required>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="password1" class="form-label">Senha</label>
-                    <input type="password" class="form-control" name="password1" id="password1">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="first_name" class="form-label">Nome</label>
+                        <input type="text" class="form-control" name="first_name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="last_name" class="form-label">Sobrenome</label>
+                        <input type="text" class="form-control" name="last_name" required>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="password2" class="form-label">Confirmar a senha</label>
-                    <input type="password" class="form-control" name="password2" id="password2">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="email_confirm" class="form-label">Confirmar E-mail</label>
+                        <input type="email" class="form-control" name="email_confirm" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="password1" class="form-label">Senha</label>
+                        <input type="password" class="form-control" name="password1" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password2" class="form-label">Confirmar a senha</label>
+                        <input type="password" class="form-control" name="password2" required>
+                    </div>
                 </div>
 
                 <label class="text-center pb-3 text-danger">{{ error }}</label>
