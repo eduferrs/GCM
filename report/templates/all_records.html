@@ -16,7 +16,10 @@
                     <tr>
                         <th class="text-center">Nome do solicitante</th>
                         <th class="text-center">Telefone</th>
-                        <th class="text-center">Endereço</th>
+                        <th class="text-center">CEP do solicitante</th>
+                        <th class="text-center">Bairro do solicitante</th>
+                        <th class="text-center">Rua do solicitante</th>
+                        <th class="text-center">N° da casa do solicitante</th>
                         <th class="text-center">É Parte da Ocorrência</th>
                         <th class="text-center">Está esperando?</th>
                         <th class="text-center">Data/Hora da Ocorrência</th>
@@ -31,13 +34,16 @@
                         <tr>
                             <td class="text-center">{{ record.caller_name }}</td>
                             <td class="text-center">{{ record.caller_phone }}</td>
-                            <td class="text-center">{{ record.caller_address }}</td>
+                            <td class="text-center">{{ record.caller_zip_code }}</td>
+                            <td class="text-center">{{ record.caller_neighborhood }}</td>
+                            <td class="text-center">{{ record.caller_street }}</td>
+                            <td class="text-center">{{ record.caller_house_number }}</td>
                             <td class="text-center">{{ record.is_caller_part_of|yesno:"Sim,Não" }}</td>
                             <td class="text-center">{{ record.is_caller_wating|yesno:"Sim,Não" }}</td>
                             <td class="text-center">{{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</td>
                             <td class="text-center">{{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</td>
-                            <td class="text-center">{{ record.user.first_name }}</td>
-                            <td class="text-center">{{ user.profile.re }}</td>
+                            <td class="text-center">{{ record.user.first_name }} {{ record.user.last_name }}</td>
+                            <td class="text-center">{{ record.user.profile.re }}</td>
                         </tr>
                     {% empty %}
                         <tr>

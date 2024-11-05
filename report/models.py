@@ -4,8 +4,6 @@ from django.core.validators import MaxValueValidator
 
 
 #Atributos do User padrão (já vem criado com o Django). 
-##Atualmente apenas username e password estão sendo utilizados para o cadastro.
-###is_active é definido como True automaticamente ao realizar um cadastro.
 
 #username: Único. Pode ser utilizado para login.
 #first_name: Opcional.
@@ -23,14 +21,17 @@ class Profile(models.Model):
     re = models.CharField(unique=True, max_length=12)
     
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name} - NE: {self.tipo_usuario} - NUSP: {self.nusp}"
+        return f"{self.user.first_name} {self.user.last_name} - RE: {self.re}"
 
 
 class Record(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     caller_name = models.CharField(max_length=100, blank=True, default="Não Informado") 
     caller_phone = models.CharField(max_length=15, blank=True, default="Não Informado")
-    caller_address = models.CharField(max_length=150, blank=True)
+    caller_zip_code = models.CharField(max_length=13, blank=True, default="Não Informado")
+    caller_neighborhood = models.CharField(max_length=100, blank=True, default="Não Informado")
+    caller_street = models.CharField(max_length=100, blank=True, default="Não Informado")
+    caller_house_number = models.CharField(max_length=13, blank=True, default="Não Informado")
     is_caller_part_of = models.BooleanField(default=False)
     is_caller_wating = models.BooleanField(default=False)
     fact_date = models.DateTimeField(null=True)

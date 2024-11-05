@@ -3,13 +3,12 @@ import re
 from .forms import RecordForm
 from .models import Record, Profile
 from openpyxl import Workbook
-from datetime import timedelta
 from django.http import HttpResponse
 from django.utils import timezone
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 
 
@@ -18,18 +17,22 @@ def home(request):
     return render(request, 'home.html')
 
 
-################################################## LOGIN
+################################################## CADASTRO
 def signup(request):
     if request.method == 'GET':
         return render(request, 'signup.html')
     
     else:
-        # Verifique se a senha e o email são confirmados corretamente
         if request.POST['password1'] == request.POST['password2'] and request.POST['email'] == request.POST['email_confirm']:
 
             if not re.fullmatch(r'\d+', request.POST['re']):
                 return render(request, 'signup.html', {
                     "error": "O RE deve conter apenas números!"
+                })
+
+            if User.objects.filter(email=request.POST['email']).exists():
+                return render(request, 'signup.html', {
+                    "error": "Este e-mail já está em uso. Tente um diferente."
                 })
 
             try:
@@ -44,7 +47,7 @@ def signup(request):
                 user.save()
 
                 profile = Profile.objects.create(
-                    user=user,                      #associando user com profile
+                    user=user,                      # Associando user e profile
                     re=request.POST['re']
                 )
                 profile.save()
@@ -53,7 +56,7 @@ def signup(request):
                     'user_created': 'Usuário criado com sucesso! É necessário que o administrador forneça permissão antes de acessar.'
                 })
             
-            except:
+            except Exception as e:
                 return render(request, 'signup.html', {
                     "error": "Erro ao criar usuário! Nome de usuário ou RE já existe."
                 })
@@ -62,6 +65,7 @@ def signup(request):
             "error": "Senhas ou e-mails divergentes!"
         })
 
+######################################################### LOGIN
 def signin(request):
     if request.method == 'GET':
         return render(request, 'signin.html', {
@@ -99,45 +103,47 @@ def signin(request):
             login(request, user)
             return redirect('user_area')
 
-
-
+#################################################################### LOGOUT
 @login_required
 def sair(request):
     logout(request)
     return redirect('home')
 
 
-#################################################################### REGISTROS EXIBIDOS NA user_area.html
+##################################################################### PAG. APOS LOGIN
 @login_required
 def user_area(request):
-    today = timezone.now()
-    start_of_day = today.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_of_day = today.replace(hour=23, minute=59, second=59, microsecond=999999)
-
-    records = Record.objects.filter(call_date__range=(start_of_day, end_of_day))
+    today = timezone.now().date()
+    records = Record.objects.filter(call_date__date=today)  
     return render(request, 'user_area.html', {'records': records})
 
 
 ##################################################################### CRIAÇÃO DE REGISTRO
 @login_required
 def create_record(request):
-    if request.method == 'GET':                         #continua no formulário se tentar uma requisição for do tipo GET
+    if request.method == 'GET':                         
         return render(request, 'create_record.html', {
             'form' : RecordForm
         })
     else:
-
-        try:                                    #salva se estiver tudo ok
+        try:
             form = RecordForm(request.POST)
             new_record = form.save(commit=False)
             new_record.user = request.user
-            if not new_record.caller_name:
-                new_record.caller_name = "Não Informado"
-            if not new_record.caller_phone:
-                new_record.caller_phone = "Não Informado"
+
+            def apply_default(field_value):
+                return field_value.strip() if field_value.strip() else "Não Informado"
+
+            new_record.caller_name = apply_default(request.POST.get('caller_name', ""))
+            new_record.caller_phone = apply_default(request.POST.get('caller_phone', ""))
+            new_record.caller_zip_code = apply_default(request.POST.get('caller_zip_code', ""))
+            new_record.caller_neighborhood = apply_default(request.POST.get('caller_neighborhood', ""))
+            new_record.caller_street = apply_default(request.POST.get('caller_street', ""))
+            new_record.caller_house_number = apply_default(request.POST.get('caller_house_number', ""))
             new_record.is_caller_part_of = 'is_caller_part_of' in request.POST
             new_record.is_caller_wating = 'is_caller_wating' in request.POST
             new_record.call_date = timezone.now()
+
             new_record.save()
             return render(request, 'create_record.html', {
                 'form' : RecordForm,
@@ -147,19 +153,15 @@ def create_record(request):
         except ValueError:                      
             return render(request, 'create_record.html', {
                 'form' : RecordForm,
-                'error' : 'Erro ao registrar! Algum campo não foi preenchido corretamente'})
+                'error' : 'Erro ao registrar! Algum campo não foi preenchido corretamente'
+            })
 
 
-
-
-############################################################################################# Consultas
+########################################################################## CONSULTAS
 @login_required
 def today_records(request):
-    today = timezone.now()
-    start_of_day = today.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_of_day = today.replace(hour=23, minute=59, second=59, microsecond=999999)
-
-    records = Record.objects.filter(call_date__range=(start_of_day, end_of_day))
+    today = timezone.now().date()  
+    records = Record.objects.filter(call_date__date=today)
     return render(request, 'today_records.html', {'records': records})
 
 @login_required
@@ -175,17 +177,19 @@ def export_records_csv(request):
     response['Content-Disposition'] = 'attachment; filename="registros_gcm.csv"'
     
     writer = csv.writer(response)
-    # Cabeçalho
-    writer.writerow([
-        'ne',
+    
+    writer.writerow([       #cabeçalho
         'solicitante',
         'telefone',
-        'endereco',
+        'cep_do_solicitante',
+        'bairro_do_solicitante',
+        'rua_do_solicitante',
+        'numero_casa_do_solicitante',
         'parte_da_ocorrencia',
-        'esperando',
+        'esperando_no_local',
         'data_hora_fato',
         'data_chamada',
-        'atendente'])
+        'plantonista'])
     
 
     for record in Record.objects.all():
@@ -202,17 +206,21 @@ def export_records_csv(request):
             call_date = record.call_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
         else:
             call_date = ''
+        
+        plantonista = f"{record.user.first_name} {record.user.last_name}" if record.user else ''
 
         writer.writerow([
-            record.ne,
             record.caller_name,
             record.caller_phone,
-            record.caller_address,
+            record.caller_zip_code,
+            record.caller_neighborhood,
+            record.caller_street,
+            record.caller_house_number,
             record.is_caller_part_of,
             record.is_caller_wating,
             fact_date,
             call_date,
-            record.user.username])
+            plantonista])
     return response
 
 
@@ -225,17 +233,18 @@ def export_records_excel(request):
     sheet = workbook.active
     sheet.title = 'Registros'
     
-    #Cabeçalho
-    sheet.append([
-        'ne',
+    sheet.append([          #cabeçalho
         'solicitante',
         'telefone',
-        'endereco',
+        'cep_do_solicitante',
+        'bairro_do_solicitante',
+        'rua_do_solicitante',
+        'numero_casa_do_solicitante',
         'parte_da_ocorrencia',
-        'esperando',
+        'esperando_no_local',
         'data_hora_fato',
         'data_chamada',
-        'atendente'])
+        'plantonista'])
     
     for record in Record.objects.all():
 
@@ -243,7 +252,7 @@ def export_records_excel(request):
         record.is_caller_wating = 'Sim' if record.is_caller_wating else 'Não'
 
         ###Formatação das datas
-        #replace(tzinfo=None) é para remoção do fuso horário desse campo.
+        #replace(tzinfo=None) é para remoção do fuso horário.
         if record.fact_date:
             fact_date = record.fact_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
         else:
@@ -254,16 +263,20 @@ def export_records_excel(request):
         else:
             call_date = ''
     
+        plantonista = f"{record.user.first_name} {record.user.last_name}" if record.user else ''
+
         sheet.append([
-            record.ne,
             record.caller_name,
             record.caller_phone,
-            record.caller_address,
+            record.caller_zip_code,
+            record.caller_neighborhood,
+            record.caller_street,
+            record.caller_house_number,
             record.is_caller_part_of,
             record.is_caller_wating,
             fact_date,
             call_date,
-            record.user.username])
+            plantonista])
 
     workbook.save(response)
     return response

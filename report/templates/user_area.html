@@ -11,19 +11,22 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading{{ forloop.counter }}">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}">
-                              Solicitante: {{ record.caller_name }} <span class="mx-4">|</span> Local: {{ record.caller_address }}
+                              Solicitante: {{ record.caller_name }} <span class="mx-4">|</span> Bairro: {{ record.caller_address }}
                         </button>
                     </h2>
                     <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <ul class="list-unstyled">
                                 <li><strong>Telefone:</strong> {{ record.caller_phone }}</li>
-                                <li><strong>Endereço:</strong> {{ record.caller_address }}</li>
+                                <li><strong>CEP do solicitante:</strong> {{ record.caller_zip_code }}</li>
+                                <li><strong>Bairro do solicitante:</strong> {{ record.caller_neighborhood }}</li>
+                                <li><strong>Rua do solicitante:</strong> {{ record.caller_street }}</li>
+                                <li><strong>N° da casa do solicitante:</strong> {{ record.caller_house_number }}</li>
                                 <li><strong>É Parte da Ocorrência?</strong> {{ record.is_caller_part_of|yesno:"Sim,Não" }}</li>
                                 <li><strong>Está esperando?</strong> {{ record.is_caller_wating|yesno:"Sim,Não" }}</li>
                                 <li><strong>Data/Hora do Fato:</strong> {{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</li>
                                 <li><strong>Data/Hora da Chamada:</strong> {{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</li>
-                                <li><strong>Plantonista:</strong> {{ record.user.first_name }}</li>
+                                <li><strong>Plantonista:</strong> {{ record.user.first_name }} {{ record.user.last_name }}</li>
                             </ul>
                         </div>
                     </div>
