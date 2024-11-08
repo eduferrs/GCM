@@ -8,68 +8,264 @@
 
             <form action="/create_record/" method="POST" class="card card-body">
                 {% csrf_token %}
+
                 <h3 class="text-center">Registrar Nova Ocorrência</h3>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="caller_name" class="form-label">Nome do solicitante</label>
-                        <input type="text" class="form-control" name="caller_name" id="caller_name">
+                {% if field_errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                        {% for error in field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        </ul>
                     </div>
+                {% endif %}
 
-                    <div class="col-md-6 mb-3">
-                        <label for="caller_phone" class="form-label">Telefone</label>
-                        <input type="text" class="form-control" name="caller_phone" id="caller_phone"
-                               oninput="formatPhone()" maxlength="15">
+                {% if error %}
+                    <div class="alert alert-danger">
+                        <p>{{ error }}</p>
                     </div>
-                </div>
+                {% endif %}
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="caller_zip_code" class="form-label">CEP</label>
-                        <input type="text" class="form-control" name="caller_zip_code" id="caller_zip_code"
-                               onblur="fetchAddressData()" oninput="formatZipCode()" maxlength="9">
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label for="caller_neighborhood" class="form-label">Bairro</label>
-                        <input type="text" class="form-control" name="caller_neighborhood" id="caller_neighborhood">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-8 mb-3">
-                        <label for="caller_street" class="form-label">Rua</label>
-                        <input type="text" class="form-control" name="caller_street" id="caller_street">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="caller_house_number" class="form-label">Número</label>
-                        <input type="text" class="form-control" name="caller_house_number" id="caller_house_number">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 form-check">
-                        <input class="form-check-input" type="checkbox" name="is_caller_part_of" value="true" id="is_caller_part_of">
-                        <label class="form-check-label" for="is_caller_part_of">
-                            O solicitante é parte da ocorrência?
-                        </label>
-                    </div>
-
-                    <div class="col-md-6 form-check">
-                        <input class="form-check-input" type="checkbox" name="is_caller_wating" value="true" id="is_caller_wating">
-                        <label class="form-check-label" for="is_caller_wating">
-                            Está aguardando no local?
-                        </label>
-                    </div>
-                </div>
-
-                <div class="mb-3 mt-3">
-                    <label for="fact_date" class="form-label">Data/hora do fato</label>
-                    <input type="datetime-local" class="form-control" name="fact_date" id="fact_date">
-                </div>
-
-                <label class="text-center pb-3 text-success">{{ success }}</label>
                 <label class="text-center pb-3 text-danger">{{ error }}</label>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="text-center">Informações do solicitante</h5>
+                    
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="caller_name" class="form-label">Nome do solicitante</label>
+                                <input type="text" class="form-control" name="caller_name" id="caller_name">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="caller_phone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" name="caller_phone" id="caller_phone"
+                                    oninput="formatPhone()" maxlength="15">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="caller_zip_code" class="form-label">CEP</label>
+                                <input type="text" class="form-control" name="caller_zip_code" id="caller_zip_code"
+                                    onblur="fetchAddressData()" oninput="formatZipCode()" maxlength="9">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="caller_neighborhood" class="form-label">Bairro</label>
+                                <input type="text" class="form-control" name="caller_neighborhood" id="caller_neighborhood">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="caller_street" class="form-label">Rua</label>
+                                <input type="text" class="form-control" name="caller_street" id="caller_street">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="caller_house_number" class="form-label">Número</label>
+                                <input type="text" class="form-control" name="caller_house_number" id="caller_house_number">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-check">
+                                <input class="form-check-input" type="checkbox" name="is_caller_part_of" value="true" id="is_caller_part_of">
+                                <label class="form-check-label" for="is_caller_part_of">
+                                    O solicitante é parte da ocorrência?
+                                </label>
+                            </div>
+
+                            <div class="col-md-6 form-check">
+                                <input class="form-check-input" type="checkbox" name="is_caller_wating" value="true" id="is_caller_wating">
+                                <label class="form-check-label" for="is_caller_wating">
+                                    Está aguardando no local?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="text-center">Local da ocorrência</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="incident_zip_code" class="form-label">CEP</label>
+                                <input type="text" class="form-control" name="incident_zip_code" id="incident_zip_code" 
+                                onblur="fetchAddressData()" oninput="formatZipCode()" maxlength="9" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="incident_neighborhood" class="form-label">Bairro</label>
+                                <input type="text" class="form-control" name="incident_neighborhood" id="incident_neighborhood" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="caller_street" class="form-label">Rua</label>
+                                <input type="text" class="form-control" name="incident_street" id="incident_street" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="incident_house_number" class="form-label">Número</label>
+                                <input type="text" class="form-control" name="incident_house_number" id="incident_house_number" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reference_point" class="form-label">Ponto de referência</label>
+                            <input type="text" class="form-control" name="reference_point" id="reference_point">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Informações pessoa envolvida/suspeita -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="text-center">Informações sobre pessoa suspeita</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="suspect_skin_color" class="form-label">Cor da pele</label>
+                                <select class="form-control" name="suspect_skin_color" id="suspect_skin_color">
+                                    <option value="Não Informado">Não Informado</option>
+                                    <option value="Branca">Branca</option>
+                                    <option value="Negra">Negra</option>
+                                    <option value="Parda">Parda</option>
+                                    <option value="Amarela">Amarela</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="suspect_haircut_style" class="form-label">Tipo/corte de cabelo</label>
+                                <input type="text" class="form-control" name="suspect_haircut_style" id="suspect_haircut_style">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="suspect_approximate_age" class="form-label">Idade aproximada</label>
+                                <input type="text" class="form-control" name="suspect_approximate_age" id="suspect_approximate_age" maxlength="3"
+                                oninput="formatAge(event)">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="suspect_approximate_height" class="form-label">Altura aproximada</label>
+                                <input type="text" class="form-control" name="suspect_approximate_height" id="suspect_approximate_height" 
+                                maxlength="4" oninput="formatHeight(event)">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="suspect_tatoos" class="form-label">Tatuagens</label>
+                                <input type="text" class="form-control" name="suspect_tatoos" id="suspect_tatoos">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="suspect_description" class="form-label">Outras características</label>
+                                <input type="text" class="form-control" name="suspect_description" id="suspect_description">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- Detalhes da ocorrência-->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="text-center">Detalhes da ocorrência</h5>
+
+                        <div class="mb-3 mt-3">
+                            <label for="fact_date" class="form-label">Data e hora do fato</label>
+                            <input type="datetime-local" class="form-control" name="fact_date" id="fact_date" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nature_of_the_incident" class="form-label">Natureza do incidente</label>
+                                <input type="text" class="form-control" name="nature_of_the_incident" id="nature_of_the_incident" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="incident_type" class="form-label">Tipo</label>
+                                <select id="type_of_incident" class="form-select" name="type_of_incident" required>
+                                    <option value="">Selecione o tipo de incidente</option>
+                                    {% for incident_type in incident_types %}
+                                        <option value="{{ incident_type.type }}">{{ incident_type.type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="number_of_people_involved" class="form-label">Número de pessoas envolvidas</label>
+                            <input type="text" class="form-control" name="number_of_people_involved" id="number_of_people_involved"
+                            oninput="onlyNumbers(event)" maxlength="5">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicle" class="form-label">Veículo</label>
+                                <input type="text" class="form-control" name="vehicle" id="vehicle">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicle_model" class="form-label">Modelo do Veículo</label>
+                                <input type="text" class="form-control" name="vehicle_model" id="vehicle_model">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicle_color" class="form-label">Cor do Veículo</label>
+                                <input type="text" class="form-control" name="vehicle_color" id="vehicle_color">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicle_type" class="form-label">Tipo de Veículo</label>
+                                <input type="text" class="form-control" name="vehicle_type" id="vehicle_type">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 form-check">
+                                <input class="form-check-input" type="checkbox" name="child_involved" id="child_involved">
+                                <label class="form-check-label" for="child_involved">
+                                    Envolve criança?
+                                </label>
+                            </div>
+                            <div class="col-md-2 form-check">
+                                <input class="form-check-input" type="checkbox" name="is_there_a_firearm" id="is_there_a_firearm">
+                                <label class="form-check-label" for="is_there_a_firearm">
+                                    Existe arma de fogo?
+                                </label>
+                            </div>
+                            <div class="col-md-2 form-check">
+                                <input class="form-check-input" type="checkbox" name="are_there_victims" id="are_there_victims">
+                                <label class="form-check-label" for="are_there_victims">
+                                    Há vítimas?
+                                </label>
+                            </div>
+                            <div class="col-md-3 form-check">
+                                <input class="form-check-input" type="checkbox" name="ambulance_required" id="ambulance_required">
+                                <label class="form-check-label" for="ambulance_required">
+                                    Precisa de ambulância?
+                                </label>
+                            </div>
+                            <div class="col-md-3 form-check">
+                                <input class="form-check-input" type="checkbox" name="priority_incident" id="priority_incident">
+                                <label class="form-check-label" for="priority_incident">
+                                    Ocorrência prioritária?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                        
+
+                
 
                 <button type="submit" class="btn btn-primary">Registrar</button>
             </form>
@@ -77,19 +273,26 @@
     </div>
 </main>
 
-<!--Scripts para buscar endereço e tratar as entradas dos campos de cep e telefone-->
+
+<!--Scripts para formatar e restringir as entradas de alguns campos-->
 <script>
 
-    function fetchAddressData() {
-        const zipCode = document.getElementById("caller_zip_code").value.replace(/\D/g, '');
+    function fetchAddressData(event) {
+        const targetId = event.target.id;
+        const zipCode = event.target.value.replace(/\D/g, '');
 
         if (zipCode.length === 8) {
             fetch(`https://viacep.com.br/ws/${zipCode}/json/`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.erro) {
-                        document.getElementById("caller_neighborhood").value = data.bairro || "Não Informado";
-                        document.getElementById("caller_street").value = data.logradouro || "Não Informado";
+                        if (targetId === "caller_zip_code") {
+                            document.getElementById("caller_neighborhood").value = data.bairro || "Não Informado";
+                            document.getElementById("caller_street").value = data.logradouro || "Não Informado";
+                        } else if (targetId === "incident_zip_code") {
+                            document.getElementById("incident_neighborhood").value = data.bairro || "Não Informado";
+                            document.getElementById("incident_street").value = data.logradouro || "Não Informado";
+                        }
                     } else {
                         alert("CEP não encontrado.");
                     }
@@ -98,8 +301,8 @@
         }
     }
 
-    function formatZipCode() {
-        const zipInput = document.getElementById("caller_zip_code");
+    function formatZipCode(event) {
+        const zipInput = event.target;
         const zipValue = zipInput.value.replace(/\D/g, '');
         
         if (zipValue.length > 5) {
@@ -125,6 +328,49 @@
             phoneInput.value = `(${phoneValue.slice(0, 2)}) ${phoneValue.slice(2, 7)}-${phoneValue.slice(7, 11)}`;
         }
     }
+
+    function formatAge(event) {
+        const input = event.target;
+        input.value = input.value.replace(/\D/g, '');
+    }
+
+    function formatHeight(event) {
+        const input = event.target;
+        let value = input.value.replace(/\D/g, ''); 
+
+        if (value.length > 1) {
+            value = value.slice(0, 1) + ',' + value.slice(1);
+        }
+        input.value = value;
+    }
+
+    //Restrição do campo de data, para nao permitir selecionar um dia futuro
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentDateTime = new Date();
+        let formattedDateTime = currentDateTime.toISOString().slice(0, 16);
+        document.getElementById('fact_date').setAttribute('max', formattedDateTime);
+    });
+
+    function onlyNumbers(event) {
+        let input = event.target;
+        let value = input.value;
+
+        input.value = value.replace(/[^0-9]/g, '');
+    }
+
+    
+    $(document).ready(function() {
+        $('#type_of_incident').select2({
+            placeholder: "Busque ou selecione o tipo de ocorrência",
+            allowClear: true,
+            tags: true,
+        });
+    });
+
+    document.getElementById("caller_zip_code").addEventListener("blur", fetchAddressData);
+    document.getElementById("caller_zip_code").addEventListener("input", formatZipCode);
+    document.getElementById("incident_zip_code").addEventListener("blur", fetchAddressData);
+    document.getElementById("incident_zip_code").addEventListener("input", formatZipCode);
 </script>
 
 {% endblock %}

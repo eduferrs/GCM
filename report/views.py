@@ -1,11 +1,12 @@
 import csv
 import re
 from .forms import RecordForm
-from .models import Record, Profile
+from .models import Record, Profile, IncidentType
 from openpyxl import Workbook
+from django.db import IntegrityError
 from django.http import HttpResponse
 from django.utils import timezone
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
@@ -113,54 +114,155 @@ def sair(request):
 ##################################################################### PAG. APOS LOGIN
 @login_required
 def user_area(request):
-    today = timezone.now().date()
-    records = Record.objects.filter(call_date__date=today)  
-    return render(request, 'user_area.html', {'records': records})
+    non_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', '-call_date')
+    non_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', '-call_date')
+    
+    if request.method == 'POST':
+        record_id = request.POST.get('record_id')
+        record = get_object_or_404(Record, id=record_id)
+
+        incident_dispatch_VTR = request.POST.get('incident_dispatch_VTR')
+        response_team = request.POST.get('response_team')
+
+        if incident_dispatch_VTR:
+            record.incident_dispatch_VTR = incident_dispatch_VTR
+        if response_team:
+            record.response_team = response_team
+
+        record.dispatched_by = request.user
+        record.dispatch_date = timezone.now()
+        record.is_dispatched = True
+        record.save()
+
+    return render(request, 'user_area.html', {
+        'non_dispatched_records': non_dispatched_records,
+        'non_finished_records': non_finished_records,
+    })
 
 
 ##################################################################### CRIAÇÃO DE REGISTRO
 @login_required
 def create_record(request):
-    if request.method == 'GET':                         
+    if request.method == 'GET':             #Carregamento da pagina
+        incident_types = IncidentType.objects.all().order_by('type')
         return render(request, 'create_record.html', {
-            'form' : RecordForm
+            'form': RecordForm(),
+            'incident_types': incident_types
         })
-    else:
+    else: 
         try:
             form = RecordForm(request.POST)
-            new_record = form.save(commit=False)
-            new_record.user = request.user
+            if form.is_valid():
 
-            def apply_default(field_value):
-                return field_value.strip() if field_value.strip() else "Não Informado"
+                new_record = form.save(commit=False)  #Cria o objeto, mas ainda não salva
+                new_record.user = request.user
 
-            new_record.caller_name = apply_default(request.POST.get('caller_name', ""))
-            new_record.caller_phone = apply_default(request.POST.get('caller_phone', ""))
-            new_record.caller_zip_code = apply_default(request.POST.get('caller_zip_code', ""))
-            new_record.caller_neighborhood = apply_default(request.POST.get('caller_neighborhood', ""))
-            new_record.caller_street = apply_default(request.POST.get('caller_street', ""))
-            new_record.caller_house_number = apply_default(request.POST.get('caller_house_number', ""))
-            new_record.is_caller_part_of = 'is_caller_part_of' in request.POST
-            new_record.is_caller_wating = 'is_caller_wating' in request.POST
-            new_record.call_date = timezone.now()
+                def apply_default(field_value):
+                    return field_value.strip() if field_value.strip() else "Não Informado"
 
-            new_record.save()
+                new_record.caller_name = apply_default(request.POST.get('caller_name', ""))
+                new_record.caller_phone = apply_default(request.POST.get('caller_phone', ""))
+                new_record.caller_zip_code = apply_default(request.POST.get('caller_zip_code', ""))
+                new_record.caller_neighborhood = apply_default(request.POST.get('caller_neighborhood', ""))
+                new_record.caller_street = apply_default(request.POST.get('caller_street', ""))
+                new_record.caller_house_number = apply_default(request.POST.get('caller_house_number', ""))
+                new_record.is_caller_part_of = 'is_caller_part_of' in request.POST
+                new_record.is_caller_wating = 'is_caller_wating' in request.POST
+
+                new_record.reference_point = apply_default(request.POST.get('reference_point', ""))
+
+                new_record.suspect_haircut_style = apply_default(request.POST.get('suspect_haircut_style', ""))
+                new_record.suspect_tatoos = apply_default(request.POST.get('suspect_tatoos', ""))
+                new_record.suspect_approximate_age = apply_default(request.POST.get('suspect_approximate_age', ""))
+                new_record.suspect_approximate_height = apply_default(request.POST.get('suspect_approximate_height', ""))
+                new_record.suspect_description = apply_default(request.POST.get('suspect_description', ""))
+
+                fact_date = request.POST.get('fact_date')
+                if fact_date:
+                    new_record.fact_date = timezone.datetime.strptime(fact_date, '%Y-%m-%dT%H:%M')
+                incident_type_value = request.POST.get('type_of_incident')
+
+                if incident_type_value:
+                    incident_type, created = IncidentType.objects.get_or_create(type=incident_type_value)
+                    new_record.incident_type = incident_type
+
+                new_record.number_of_people_involved = apply_default(request.POST.get('number_of_people_involved', ""))
+                new_record.nature_of_the_incident = apply_default(request.POST.get('nature_of_the_incident', ""))
+                new_record.vehicle = apply_default(request.POST.get('vehicle', ""))
+                new_record.vehicle_model = apply_default(request.POST.get('vehicle_model', ""))
+                new_record.vehicle_color = apply_default(request.POST.get('vehicle_color', ""))
+                new_record.vehicle_type = apply_default(request.POST.get('vehicle_type', ""))
+
+                new_record.child_involved = 'child_involved' in request.POST
+                new_record.is_there_a_firearm = 'is_there_a_firearm' in request.POST
+                new_record.are_there_victims = 'are_there_victims' in request.POST
+                new_record.ambulance_required = 'ambulance_required' in request.POST
+                new_record.priority_incident = 'priority_incident' in request.POST
+
+                new_record.call_date = timezone.localtime(timezone.now())
+                new_record.save()
+
+                #Se não houver erro, direciona para user_area.html
+                non_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', '-call_date')
+                non_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', '-call_date')
+                return render(request, 'user_area.html', {
+                    'non_dispatched_records': non_dispatched_records,
+                    'non_finished_records': non_finished_records
+                })
+
+            else: #Se houver algum erro, recarrega e passa uma mensagem
+
+                incident_types = IncidentType.objects.all().order_by('type')
+                
+                field_errors = []
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        field_errors.append(f"Campo {field}: {error}")
+                
+                if field_errors:
+                    return render(request, 'create_record.html', {
+                        'form': form,
+                        'incident_types': incident_types,
+                        'field_errors': field_errors
+                    })
+                else:
+                    return render(request, 'create_record.html', {
+                        'form': form,
+                        'incident_types': incident_types,
+                        'error': 'Erro ao tentar registrar!'
+                    })
+
+        except ValueError as e:
+
+            incident_types = IncidentType.objects.all().order_by('type')
             return render(request, 'create_record.html', {
-                'form' : RecordForm,
-                'success' : 'Registro criado com sucesso!'
+                'form': form,
+                'incident_types': incident_types,
+                'error': f'Ocorreu um erro ao registrar: {str(e)}'
             })
         
-        except ValueError:                      
-            return render(request, 'create_record.html', {
-                'form' : RecordForm,
-                'error' : 'Erro ao registrar! Algum campo não foi preenchido corretamente'
-            })
+        except IntegrityError as e:
 
+            incident_types = IncidentType.objects.all().order_by('type')
+            return render(request, 'create_record.html', {
+                'form': form,
+                'incident_types': incident_types,
+                'error': f'Erro de integridade: {str(e)}. Verifique se não há dados duplicados.'
+            })
+        
+        except Exception as e:
+
+            incident_types = IncidentType.objects.all().order_by('type')
+            return render(request, 'create_record.html', {
+                'form': form,
+                'incident_types': incident_types,
+                'error': f'Ocorreu um erro inesperado: {str(e)}'
+            })
 
 ########################################################################## CONSULTAS
 @login_required
 def today_records(request):
-    today = timezone.now().date()  
+    today = timezone.localtime(timezone.now()).date()  
     records = Record.objects.filter(call_date__date=today)
     return render(request, 'today_records.html', {'records': records})
 
