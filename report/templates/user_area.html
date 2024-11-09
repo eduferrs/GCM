@@ -15,17 +15,26 @@
                             {% if record.priority_incident %}
                                 <span class="mx-3 badge bg-danger">Prioritário</span>
                             {% else %}
-                                <span class="mx-3 badge bg-primary">Não Prioritário</span>
+                                <span class="mx-3 badge bg-primary">Não prioritário</span>
                             {% endif %}
-                            ID: {{ record.id }} <span class="mx-4">|</span> 
                             Solicitante: {{ record.caller_name }} <span class="mx-4">|</span> 
-                            {{ record.type_of_incident }} <span class="mx-4">|</span> 
-                            Hora: {{ record.call_date|date:"H:i" }}
+                            {{ record.type_of_incident }}
                         </button>
                     </h2>
                     <div id="collapseDispatched{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionDispatched">
                         <div class="accordion-body">
                             <div class="row d-flex align-items-stretch">
+
+                                <div class="col-md-12 mb-3 text-center">
+                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>ID:</strong> {{ record.id }}</li>
+                                            <li><strong>Quem registrou:</strong> {{ record.user.first_name }} {{ record.user.last_name }}</li>
+                                            <li><strong>Hora:</strong> {{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}
+                                        </ul>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-6 mb-3">
                                     <div class="p-3 border rounded shadow-sm bg-light h-100">
                                         <h5>Informações sobre o solicitante</h5>
@@ -83,14 +92,7 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="col-md-12 mb-3">
-                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
-                                        <h5>Responsável pelo registro</h5>
-                                        <ul class="list-unstyled mb-0">
-                                            <li><strong>Plantonista:</strong> {{ record.user.first_name }} {{ record.user.last_name }}</li>
-                                        </ul>
-                                    </div>
-                                </div>
+                                
 
                             </div>
 
@@ -153,17 +155,28 @@
                             {% if record.priority_incident %}
                                 <span class="mx-3 badge bg-danger">Prioritário</span>
                             {% else %}
-                                <span class="mx-3 badge bg-primary">Não Prioritário</span>
-                            {% endif %}
-                            ID: {{ record.id }} <span class="mx-4">|</span> 
+                                <span class="mx-3 badge bg-primary">Não prioritário</span>
+                            {% endif %} 
                             Solicitante: {{ record.caller_name }} <span class="mx-4">|</span> 
-                            {{ record.type_of_incident }} <span class="mx-4">|</span> 
-                            Hora: {{ record.call_date|date:"H:i" }}
+                            {{ record.type_of_incident }}
                         </button>
                     </h2>
                     <div id="collapseFinished{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionFinished">
                         <div class="accordion-body">
                             <div class="row d-flex align-items-stretch">
+
+                                <div class="col-md-12 mb-3 text-center">
+                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>ID:</strong> {{ record.id }}</li>
+                                            <li><strong>Quem registrou:</strong> {{ record.user.first_name }} {{ record.user.last_name }}</li>
+                                            <li><strong>Hora</strong> {{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}<li>
+                                            <li><strong>Quem despachou:</strong> {{ record.dispatched_by.first_name }} {{ record.dispatched_by.last_name }}</li>
+                                            <li><strong>Hora do despacho:</strong> {{ record.dispatch_date|date:"d/m/Y" }} às {{ record.dispatch_date|date:"H:i" }}<li>
+                                        </ul>
+                                    </div> 
+                                </div>
+
                                 <div class="col-md-6 mb-3">
                                     <div class="p-3 border rounded shadow-sm bg-light h-100">
                                         <h5>Informações sobre o solicitante</h5>
@@ -220,16 +233,6 @@
                                             <li><strong>Ambulância necessária?</strong> {{ record.ambulance_required|yesno:"Sim,Não" }}</li>
                                         </ul>
                                     </div>
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
-                                        <h5>Outros:</h5>
-                                        <ul class="list-unstyled mb-0">
-                                            <li><strong>Quem criou o registro:</strong> {{ record.user.first_name }} {{ record.user.last_name }}</li>
-                                            <li><strong>Quem despachou:</strong> {{ record.dispatched_by.first_name }} {{ record.dispatched_by.last_name }}</li>
-                                            <li><strong>Hora do despacho:</strong> {{ record.dispatch_date|date:"d/m/Y" }} às {{ record.dispatch_date|date:"H:i" }}<li>
-                                        </ul>
-                                    </div> 
                                 </div>
                             </div>
                         </div>
