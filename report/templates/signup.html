@@ -17,7 +17,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="re" class="form-label">RE</label>
-                        <input type="text" class="form-control" name="re" required>
+                        <input type="text" class="form-control" name="re" oninput="onlyNumbers(event)" required>
                     </div>
                 </div>
 
@@ -61,5 +61,14 @@
         </div>
     </div>
 </main>
+
+<script>
+    function onlyNumbers(event) {
+        let input = event.target;
+        let value = input.value;
+
+        input.value = value.replace(/[^0-9]/g, '');
+    }
+</script>
 
 {% endblock %}

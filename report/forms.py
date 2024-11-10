@@ -44,5 +44,9 @@ class RecordForm(forms.ModelForm):
             'is_dispatched',
             'is_finished',
 
+            'incident_dispatch_VTR',
+            'response_team',
+            'dispatched_by',
+
         ]
     call_date = forms.DateTimeField(required=False)

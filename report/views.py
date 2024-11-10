@@ -114,8 +114,8 @@ def sair(request):
 ##################################################################### PAG. APOS LOGIN
 @login_required
 def user_area(request):
-    non_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', '-call_date')
-    non_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', '-call_date')
+    not_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', 'call_date')
+    not_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', 'call_date')
     
     if request.method == 'POST':
         record_id = request.POST.get('record_id')
@@ -135,8 +135,8 @@ def user_area(request):
         record.save()
 
     return render(request, 'user_area.html', {
-        'non_dispatched_records': non_dispatched_records,
-        'non_finished_records': non_finished_records,
+        'not_dispatched_records': not_dispatched_records,
+        'not_finished_records': not_finished_records,
     })
 
 
@@ -203,11 +203,11 @@ def create_record(request):
                 new_record.save()
 
                 #Se não houver erro, direciona para user_area.html
-                non_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', '-call_date')
-                non_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', '-call_date')
+                not_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', '-call_date')
+                not_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', '-call_date')
                 return render(request, 'user_area.html', {
-                    'non_dispatched_records': non_dispatched_records,
-                    'non_finished_records': non_finished_records
+                    'not_dispatched_records': not_dispatched_records,
+                    'not_finished_records': not_finished_records
                 })
 
             else: #Se houver algum erro, recarrega e passa uma mensagem

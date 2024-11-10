@@ -1,0 +1,141 @@
+<h3 class="text-center">Ocorrências não despachadas:</h3>
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <div class="accordion" id="accordionDispatched">
+                {% for record in not_dispatched_records %}
+                <div class="accordion-item {% if record.priority_incident %}{% endif %}">
+
+                    <h2 class="accordion-header" id="headingDispatched{{ forloop.counter }}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapseDispatched{{ forloop.counter }}" aria-expanded="true" 
+                        aria-controls="collapseDispatched{{ forloop.counter }}">
+
+                            {% if record.priority_incident %}
+                                <span class="px-2 badge bg-danger">Prioritário</span>
+                            {% endif %} 
+                            <span class="px-2"></span>{{ record.type_of_incident }}
+
+                        </button>
+                    </h2>
+
+                    <div id="collapseDispatched{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionDispatched">
+                        <div class="accordion-body">
+                            <div class="row d-flex align-items-stretch">
+
+                                <div class="col-md-12 mb-3 text-center">
+                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>ID:</strong> {{ record.id }}</li>
+                                            <li><strong>Registrado por:</strong> {{ record.user.first_name }} {{ record.user.last_name }}</li>
+                                            <li><strong>Hora do registro:</strong> {{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
+                                        <h5>Informações sobre o solicitante</h5>
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>Nome:</strong> {{ record.caller_name }}</li>
+                                            <li><strong>Telefone:</strong> {{ record.caller_phone }}</li>
+                                            <li><strong>CEP:</strong> {{ record.caller_zip_code }}</li>
+                                            <li><strong>Bairro:</strong> {{ record.caller_neighborhood }}</li>
+                                            <li><strong>Rua:</strong> {{ record.caller_street }}</li>
+                                            <li><strong>N° da casa:</strong> {{ record.caller_house_number }}</li>
+                                            <li><strong>É Parte da Ocorrência?</strong> {{ record.is_caller_part_of|yesno:"Sim,Não" }}</li>
+                                            <li><strong>Está esperando?</strong> {{ record.is_caller_wating|yesno:"Sim,Não" }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
+                                        <h5>Local da ocorrência</h5>
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>CEP:</strong> {{ record.incident_zip_code }}</li>
+                                            <li><strong>Bairro:</strong> {{ record.incident_neighborhood }}</li>
+                                            <li><strong>Rua:</strong> {{ record.incident_street }}</li>
+                                            <li><strong>N° local:</strong> {{ record.incident_house_number }}</li>
+                                            <li><strong>Ponto de referência:</strong> {{ record.reference_point }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
+                                        <h5>Informações sobre suspeito</h5>
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>Cor da pele:</strong> {{ record.suspect_skin_color }}</li>
+                                            <li><strong>Corte/estilo de cabelo:</strong> {{ record.suspect_haircut_style }}</li>
+                                            <li><strong>Tatuagens:</strong> {{ record.suspect_tatoos }}</li>
+                                            <li><strong>Idade aproximada:</strong> {{ record.suspect_approximate_age }}</li>
+                                            <li><strong>Altura aproximada:</strong> {{ record.suspect_approximate_height }}</li>
+                                            <li><strong>Outras características:</strong> {{ record.suspect_description }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded shadow-sm bg-light h-100">
+                                        <h5>Detalhes sobre a ocorrência</h5>
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>Data/Hora do Fato:</strong> {{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</li>
+                                            <li><strong>Natureza:</strong> {{ record.nature_of_the_incident }}</li>
+                                            <li><strong>Pessoas envolvidas:</strong> {{ record.number_of_people_involved }}</li>
+                                            <li><strong>Veículo:</strong> {{ record.vehicle }}</li>
+                                            <li><strong>Modelo:</strong> {{ record.vehicle_model }}</li>
+                                            <li><strong>Cor:</strong> {{ record.vehicle_color }}</li>
+                                            <li><strong>Tipo:</strong> {{ record.vehicle_type }}</li>
+                                            <li><strong>Criança envolvida?</strong> {{ record.child_involved|yesno:"Sim,Não" }}</li>
+                                            <li><strong>Arma de Fogo?</strong> {{ record.is_there_a_firearm|yesno:"Sim,Não" }}</li>
+                                            <li><strong>Vítimas?</strong> {{ record.are_there_victims|yesno:"Sim,Não" }}</li>
+                                            <li><strong>Ambulância necessária?</strong> {{ record.ambulance_required|yesno:"Sim,Não" }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <div class="p-3 border rounded shadow-sm bg-light">
+                                    <h5 class="text-center">Despachar Ocorrência</h5>
+                                    <form method="POST" action="/user_area/">
+                                        {% csrf_token %}
+                                        
+                                        <input type="hidden" name="record_id" value="{{ record.id }}">
+
+                                        <div class="mb-3">
+                                            <label for="incident_dispatch_VTR{{ forloop.counter }}" class="form-label">VTR</label>
+                                            <input type="text" class="form-control" id="incident_dispatch_VTR{{ forloop.counter }}" 
+                                            name="incident_dispatch_VTR" value="{{ record.incident_dispatch_VTR }}" required>
+                                        </div>
+                                        
+                                       
+                                        <div class="mb-3">
+                                            <label for="response_team{{ forloop.counter }}" class="form-label">Equipe</label>
+                                            <input type="text" class="form-control" id="response_team{{ forloop.counter }}" 
+                                            name="response_team" value="{{ record.response_team }}" required>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary w-100">Despachar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNoRecordsDispatched" aria-expanded="true" aria-controls="collapseNoRecordsDispatched">
+                            Nenhum registro encontrado
+                        </button>
+                    </h2>
+                    <div id="collapseNoRecordsDispatched" class="accordion-collapse collapse show" data-bs-parent="#accordionDispatched">
+                        <div class="accordion-body">
+                            Não há ocorrências não despachadas.
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
