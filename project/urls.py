@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from report.views import home, signin, signup, sair, user_area, create_record, all_records, today_records, export_records_csv, export_records_excel
+from report.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +27,8 @@ urlpatterns = [
 
     path('user_area/', user_area, name='user_area'),
     path('create_record/', create_record, name='create_record'),
+    path('notdispatched/', notdispatched, name='notdispatched'),
+    path('notfinished/', notfinished, name='notfinished'),
 
 
     path('today_records/', today_records, name='today_records'),

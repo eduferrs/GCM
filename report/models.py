@@ -63,7 +63,7 @@ class Record(models.Model):
     ambulance_required = models.BooleanField(default=False)
     priority_incident = models.BooleanField(default=False)
     is_dispatched = models.BooleanField(default=False)
-    is_finished = models.BooleanField(default=False)
+    
 
     incident_dispatch_VTR = models.CharField(max_length=100, blank=True)
     response_team = models.CharField(max_length=100, blank=True)
@@ -77,14 +77,15 @@ class Record(models.Model):
     bopc = models.CharField(max_length=100, blank=True, default="Não Informado")
     police_chief_qra = models.CharField(max_length=100, blank=True, default="Não Informado")
     incident_conclusion_time = models.DateTimeField(null=True)
-
     officer_in_charge = models.CharField(max_length=100, blank=True)
     notification_time = models.DateTimeField(null=True)
     officer_in_charge_actions = models.CharField(max_length=254, blank=True)
+    is_finished = models.BooleanField(default=False)
+    finished_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='finished_records', null=True, blank=True)
 
 
     def __str__(self):
-        return f"{self.id} - Solicitante: { self.caller_name } - Tipo: {self.type_of_incident} - "
+        return f"{self.id} - { self.caller_name } - {self.type_of_incident}"
 
 
 

@@ -1,13 +1,13 @@
 <h3 class="text-center">Ocorrências não despachadas:</h3>
     <div class="row justify-content-center mb-4">
-        <div class="col-md-8">
+        <div class="col-md-8 w-100">
             <div class="accordion" id="accordionDispatched">
                 {% for record in not_dispatched_records %}
                 <div class="accordion-item {% if record.priority_incident %}{% endif %}">
 
                     <h2 class="accordion-header" id="headingDispatched{{ forloop.counter }}">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" 
-                        data-bs-target="#collapseDispatched{{ forloop.counter }}" aria-expanded="true" 
+                        data-bs-target="#collapseDispatched{{ forloop.counter }}" aria-expanded="false" 
                         aria-controls="collapseDispatched{{ forloop.counter }}">
 
                             {% if record.priority_incident %}
@@ -18,7 +18,7 @@
                         </button>
                     </h2>
 
-                    <div id="collapseDispatched{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionDispatched">
+                    <div id="collapseDispatched{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionDispatched">
                         <div class="accordion-body">
                             <div class="row d-flex align-items-stretch">
 
@@ -97,7 +97,7 @@
                             <div class="col-md-12 mb-3">
                                 <div class="p-3 border rounded shadow-sm bg-light">
                                     <h5 class="text-center">Despachar Ocorrência</h5>
-                                    <form method="POST" action="/user_area/">
+                                    <form method="POST" action="/notdispatched/">
                                         {% csrf_token %}
                                         
                                         <input type="hidden" name="record_id" value="{{ record.id }}">

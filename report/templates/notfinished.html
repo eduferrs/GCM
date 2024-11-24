@@ -1,27 +1,30 @@
 <h3 class="text-center">Ocorrências não finalizadas:</h3>
     <div class="row justify-content-center mb-4">
-        <div class="col-md-8">
+        <div class="col-md-8 w-100">
             <div class="accordion" id="accordionFinished">
                 {% for record in not_finished_records %}
                 <div class="accordion-item {% if record.priority_incident %}{% endif %}">
                     <h2 class="accordion-header" id="headingFinished{{ forloop.counter }}">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFinished{{ forloop.counter }}" aria-expanded="true" aria-controls="collapseFinished{{ forloop.counter }}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFinished{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseFinished{{ forloop.counter }}">
                             {% if record.priority_incident %}
                                 <span class="px-2 badge bg-danger">Prioritário</span>
                             {% endif %} 
                             <span class="px-2"></span> {{ record.type_of_incident }}
                         </button>
                     </h2>
-                    <div id="collapseFinished{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionFinished">
+                    <div id="collapseFinished{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionFinished">
                         <div class="accordion-body">
                             <div class="row d-flex align-items-stretch">
 
                                 <div class="col-md-12 mb-3 text-center">
                                     <div class="p-3 border rounded shadow-sm bg-light h-100">
                                         <ul class="list-unstyled mb-0">
-                                            <li><strong>ID:</strong> {{ record.id }}</li>
+                                            <li><strong>VTR:</strong> {{ record.incident_dispatch_VTR }}</li>
+                                            <li><strong>Equipe:</strong> {{ record.response_team}}</li>
+                                            <!--
                                             <li><strong>Registrado por:</strong> {{ record.user.first_name }} {{ record.user.last_name }}</li>
                                             <li><strong>Despachado por:</strong> {{ record.dispatched_by.first_name }} {{ record.dispatched_by.last_name }}</li>
+                                            -->
                                             <li><strong>Hora do registro:</strong> {{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}<li>
                                             <li><strong>Hora do despacho:</strong> {{ record.dispatch_date|date:"d/m/Y" }} às {{ record.dispatch_date|date:"H:i" }}<li>
                                         </ul>
@@ -86,6 +89,93 @@
                                         </ul>
                                     </div>
                                 </div>
+
+                                <div class="col-md-12 mb-3">
+                                    <div class="p-3 border rounded shadow-sm bg-light">
+                                        <h5 class="text-center">Concluir Ocorrência</h5>
+                                        <form method="POST" action="/notfinished/">
+                                            {% csrf_token %}
+                                            
+                                            <input type="hidden" name="record_id" value="{{ record.id }}">
+                                            
+                                            <div class="row mt-5 mb-3">
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="ro{{ forloop.counter }}" name="ro">
+                                                        <label class="form-check-label" for="ro{{ forloop.counter }}">RO</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="ri{{ forloop.counter }}" name="ri">
+                                                        <label class="form-check-label" for="ri{{ forloop.counter }}">RI</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="joint_operation{{ forloop.counter }}" name="joint_operation">
+                                                        <label class="form-check-label" for="joint_operation{{ forloop.counter }}">Operação Conjunta</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="police_district{{ forloop.counter }}" class="form-label">Distrito Policial</label>
+                                                        <input type="text" class="form-control" id="police_district{{ forloop.counter }}" name="police_district">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="bopc{{ forloop.counter }}" class="form-label">N° BOPC</label>
+                                                        <input type="text" class="form-control" id="bopc{{ forloop.counter }}" name="bopc">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="police_chief_qra{{ forloop.counter }}" class="form-label">QRA do Delegado</label>
+                                                        <input type="text" class="form-control" id="police_chief_qra{{ forloop.counter }}" name="police_chief_qra">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                                 
+                                            <div class="mb-3">
+                                                <label for="incident_conclusion_time{{ forloop.counter }}" class="form-label">Horário do término da ocorrência</label>
+                                                <input type="datetime-local" class="form-control" id="incident_conclusion_time{{ forloop.counter }}" name="incident_conclusion_time" required>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="officer_in_charge{{ forloop.counter }}" class="form-label">Comunicado ao responsável</label>
+                                                    <select class="form-select" id="officer_in_charge{{ forloop.counter }}" name="officer_in_charge" required>
+                                                        <option value="" disabled selected></option>
+                                                        {% for user in users %}
+                                                        <option value="{{ user.first_name }} {{ user.last_name }}">{{ user.first_name }} {{ user.last_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="notification_time{{ forloop.counter }}" class="form-label">Horário do comunicado</label>
+                                                    <input type="datetime-local" class="form-control" id="notification_time{{ forloop.counter }}" name="notification_time" required>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="officer_in_charge_actions{{ forloop.counter }}" class="form-label">Providências adotadas pelo responsável do plantão</label>
+                                                <textarea class="form-control" id="officer_in_charge_actions{{ forloop.counter }}" name="officer_in_charge_actions" rows="3" required></textarea>
+                                            </div>
+                        
+                                            <button type="submit" class="btn btn-primary w-100">Concluir</button>
+                                        </form>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>

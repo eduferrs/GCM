@@ -3,15 +3,16 @@
 {% block content %}
 
 <main class="container py-5 mt-5">
-
     <section class="pb-5 p-4 rounded-3 shadow-sm border mb-4">
-        {% include "notdispatched.html" %}
+        <div class="row">
+            <div class="col-md-6">
+                {% include "notdispatched.html" %}
+            </div>
+            <div class="col-md-6">
+                {% include "notfinished.html" %}
+            </div>
+        </div>
     </section>
-
-    <section class="pb-5 p-4 rounded-3 shadow-sm border mb-4">
-        {% include "notfinished.html" %}
-    </section>
-
 </main>
 
 {% endblock %}

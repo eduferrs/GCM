@@ -6,34 +6,83 @@
     <div class="row">
         <div class="col-md-8 offset-md-2">
 
-            <h2 class="text-center">Ocorrências de Hoje</h2>
+            
 
             <div class="card card-body mb-3">
                 <a href="{% url 'export_records_csv' %}" class="btn btn-primary mb-3">Exportar em csv</a>
                 <a href="{% url 'export_records_excel' %}" class="btn btn-success">Exportar em xlsx</a>
             </div>
 
+            <h2 class="text-center">Ocorrências de Hoje</h2>
+
             <div class="table-responsive">
                 <table class="table table-bordered table-striped table-hover">
                     <thead class="thead-dark">
                         <tr>
+                            <th class="text-center">id</th>
+                            <th class="text-center">Data da ocorrência</th>
+                            <th class="text-center">Data da chamada</th>
+                            <th class="text-center">Término da ocorrência</th>
                             <th class="text-center">Nome do solicitante</th>
-                            <th class="text-center">Telefone</th>
+                            <th class="text-center">Telefone do solicitante</th>
                             <th class="text-center">CEP do solicitante</th>
                             <th class="text-center">Bairro do solicitante</th>
                             <th class="text-center">Rua do solicitante</th>
                             <th class="text-center">N° da casa do solicitante</th>
-                            <th class="text-center">É Parte da Ocorrência</th>
-                            <th class="text-center">Está esperando?</th>
-                            <th class="text-center">Data/Hora da Ocorrência</th>
-                            <th class="text-center">Data da Chamada</th>
+                            <th class="text-center">Solicitante é parte da ocorrência?</th>
+                            <th class="text-center">Solicitante está esperando?</th>
+
+                            <th class="text-center">CEP da Ocorrência</th>
+                            <th class="text-center">Local da Ocorrência</th>
+                            <th class="text-center">Rua da Ocorrência</th>
+                            <th class="text-center">N° da Casa da Ocorrência</th>
+                            <th class="text-center">Ponto de referência</th>
+
+                            <th class="text-center">Cor da pele (suspeito)</th>
+                            <th class="text-center">Corte de cabelo (suspeito)</th>
+                            <th class="text-center">Tatuagens (suspeito)</th>
+                            <th class="text-center">Idade aproximada (suspeito)</th>
+                            <th class="text-center">Altura aproximada (suspeito)</th>
+                            <th class="text-center">Outras características (suspeito)</th>
+
+                            <th class="text-center">Natureza da ocorrência</th>
+                            <th class="text-center">Tipo de ocorrência</th>
+                            <th class="text-center">Arma de fogo?</th>
+                            <th class="text-center">Criança envolvida?</th>
+                            <th class="text-center">Quantidade de envolvidos</th>
+
+                            <th class="text-center">Veículo</th>
+                            <th class="text-center">Modelo (veículo)</th>
+                            <th class="text-center">Cor (veículo)</th>
+                            <th class="text-center">Tipo (veículo)</th>
+                            <th class="text-center">Há vítimas?</th>
+                            <th class="text-center">Precisa de ambulância?</th>
+                            <th class="text-center">Prioridade no atendimento?</th>
+
+                            <th class="text-center">Despacho VTR</th>
+                            <th class="text-center">Equipe</th>
+
+                            <th class="text-center">RO</th>
+                            <th class="text-center">RI</th>
+                            <th class="text-center">Operação conjunta</th>
+                            <th class="text-center">Distrito policial</th>
+                            <th class="text-center">N° BOPC</th>
+                            <th class="text-center">QRA do delegado</th>
                             <th class="text-center">Plantonista</th>
-                            <th class="text-center">RE</th>
+                            <th class="text-center">RE do plantonista</th> 
+                            <th class="text-center">Responsável do plantão</th>
+                            <th class="text-center">Hora do comunicado ao responsável</th>
+                            <th class="text-center">Providências adotadas pelo responsável</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
                         {% for record in records %}
                             <tr>
+                                <td class="text-center">{{ record.id }}</td>
+                                <td class="text-center">{{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</td>
+                                <td class="text-center">{{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</td>
+                                <td class="text-center">{{ record.incident_conclusion_time|date:"d/m/Y" }} às {{ record.incident_conclusion_time|date:"H:i" }}</td>
                                 <td class="text-center">{{ record.caller_name }}</td>
                                 <td class="text-center">{{ record.caller_phone }}</td>
                                 <td class="text-center">{{ record.caller_zip_code }}</td>
@@ -42,10 +91,49 @@
                                 <td class="text-center">{{ record.caller_house_number }}</td>
                                 <td class="text-center">{{ record.is_caller_part_of|yesno:"Sim,Não" }}</td>
                                 <td class="text-center">{{ record.is_caller_wating|yesno:"Sim,Não" }}</td>
-                                <td class="text-center">{{ record.fact_date|date:"d/m/Y" }} às {{ record.fact_date|date:"H:i" }}</td>
-                                <td class="text-center">{{ record.call_date|date:"d/m/Y" }} às {{ record.call_date|date:"H:i" }}</td>
+
+                                <td class="text-center">{{ record.incident_zip_code }}</td>
+                                <td class="text-center">{{ record.incident_neighborhood }}</td>
+                                <td class="text-center">{{ record.incident_street }}</td>
+                                <td class="text-center">{{ record.incident_house_number }}</td>
+                                <td class="text-center">{{ record.reference_point }}</td>
+
+                                <td class="text-center">{{ record.suspect_skin_color }}</td>
+                                <td class="text-center">{{ record.suspect_haircut_style }}</td>
+                                <td class="text-center">{{ record.suspect_tatoos }}</td>
+                                <td class="text-center">{{ record.suspect_approximate_age }}</td>
+                                <td class="text-center">{{ record.suspect_approximate_height }}</td>
+                                <td class="text-center">{{ record.suspect_description }}</td>
+
+                                <td class="text-center">{{ record.nature_of_the_incident }}</td>
+                                <td class="text-center">{{ record.type_of_incident }}</td>
+                                <td class="text-center">{{ record.is_there_a_firearm|yesno:"Sim,Não" }}</td>
+                                <td class="text-center">{{ record.child_involved|yesno:"Sim,Não" }}</td>
+                                <td class="text-center">{{ record.number_of_people_involved }}</td>
+
+                                <td class="text-center">{{ record.vehicle }}</td>
+                                <td class="text-center">{{ record.vehicle_model }}</td>
+                                <td class="text-center">{{ record.vehicle_color }}</td>
+                                <td class="text-center">{{ record.vehicle_type }}</td>
+                                <td class="text-center">{{ record.are_there_victims|yesno:"Sim,Não" }}</td>
+                                <td class="text-center">{{ record.ambulance_required|yesno:"Sim,Não" }}</td>
+                                <td class="text-center">{{ record.priority_incident|yesno:"Sim,Não" }}</td>
+
+                                <td class="text-center">{{ record.incident_dispatch_VTR }}</td>
+                                <td class="text-center">{{ record.response_team }}</td>
+
+                                <td class="text-center">{{ record.ro|yesno:"Sim,Não" }}</td>
+                                <td class="text-center">{{ record.ri|yesno:"Sim,Não" }}</td>
+                                <td class="text-center">{{ record.joint_operation|yesno:"Sim,Não" }}</td>
+                                <td class="text-center">{{ record.police_district }}</td>
+                                <td class="text-center">{{ record.bopc }}</td>
+                                <td class="text-center">{{ record.police_chief_qra }}</td>
                                 <td class="text-center">{{ record.user.first_name }} {{ record.user.last_name }}</td>
                                 <td class="text-center">{{ record.user.profile.re }}</td>
+                                <td class="text-center">{{ record.officer_in_charge }}</td>
+                                <td class="text-center">{{ record.notification_time|date:"d/m/Y" }} às {{ record.notification_time|date:"H:i" }}</td>
+                                <td class="text-center">{{ record.officer_in_charge_actions }}</td>
+
                             </tr>
                         {% empty %}
                             <tr>

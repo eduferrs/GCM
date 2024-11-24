@@ -48,5 +48,18 @@ class RecordForm(forms.ModelForm):
             'response_team',
             'dispatched_by',
 
+            'ro',
+            'ri',
+            'joint_operation',
+            'police_district',
+            'bopc',
+            'police_chief_qra',
+            'incident_conclusion_time',
+            'officer_in_charge',
+            'notification_time',
+            'officer_in_charge_actions',
+
         ]
     call_date = forms.DateTimeField(required=False)
+    incident_conclusion_time = forms.DateTimeField(required=False)
+    notification_time = forms.DateTimeField(required=False)

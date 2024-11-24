@@ -116,28 +116,14 @@ def sair(request):
 def user_area(request):
     not_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', 'call_date')
     not_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', 'call_date')
-    
-    if request.method == 'POST':
-        record_id = request.POST.get('record_id')
-        record = get_object_or_404(Record, id=record_id)
-
-        incident_dispatch_VTR = request.POST.get('incident_dispatch_VTR')
-        response_team = request.POST.get('response_team')
-
-        if incident_dispatch_VTR:
-            record.incident_dispatch_VTR = incident_dispatch_VTR
-        if response_team:
-            record.response_team = response_team
-
-        record.dispatched_by = request.user
-        record.dispatch_date = timezone.now()
-        record.is_dispatched = True
-        record.save()
+    users = User.objects.filter(is_active=True)
 
     return render(request, 'user_area.html', {
         'not_dispatched_records': not_dispatched_records,
         'not_finished_records': not_finished_records,
+        'users': users,
     })
+
 
 
 ##################################################################### CRIAÇÃO DE REGISTRO
@@ -180,8 +166,8 @@ def create_record(request):
                 fact_date = request.POST.get('fact_date')
                 if fact_date:
                     new_record.fact_date = timezone.datetime.strptime(fact_date, '%Y-%m-%dT%H:%M')
+                
                 incident_type_value = request.POST.get('type_of_incident')
-
                 if incident_type_value:
                     incident_type, created = IncidentType.objects.get_or_create(type=incident_type_value)
                     new_record.incident_type = incident_type
@@ -202,14 +188,8 @@ def create_record(request):
                 new_record.call_date = timezone.localtime(timezone.now())
                 new_record.save()
 
-                #Se não houver erro, direciona para user_area.html
-                not_dispatched_records = Record.objects.filter(is_dispatched=False).order_by('-priority_incident', '-call_date')
-                not_finished_records = Record.objects.filter(is_finished=False, is_dispatched=True).order_by('-priority_incident', '-call_date')
-                return render(request, 'user_area.html', {
-                    'not_dispatched_records': not_dispatched_records,
-                    'not_finished_records': not_finished_records
-                })
-
+                return redirect('user_area')
+               
             else: #Se houver algum erro, recarrega e passa uma mensagem
 
                 incident_types = IncidentType.objects.all().order_by('type')
@@ -259,6 +239,67 @@ def create_record(request):
                 'error': f'Ocorreu um erro inesperado: {str(e)}'
             })
 
+
+########################################################################## DESPACHAR OCORRENCIA
+@login_required
+def notdispatched(request):
+    
+    if request.method == 'POST':
+        record_id = request.POST.get('record_id')
+        record = get_object_or_404(Record, id=record_id)
+
+        incident_dispatch_VTR = request.POST.get('incident_dispatch_VTR')
+        response_team = request.POST.get('response_team')
+
+        if incident_dispatch_VTR:
+            record.incident_dispatch_VTR = incident_dispatch_VTR
+        if response_team:
+            record.response_team = response_team
+
+        record.dispatched_by = request.user
+        record.dispatch_date = timezone.now()
+        record.is_dispatched = True
+        record.save()
+
+    return redirect('user_area')
+
+########################################################################## FINALIZAR OCORRENCIA
+@login_required
+def notfinished(request):
+    
+    if request.method == 'POST':
+        record_id = request.POST.get('record_id')
+        record = get_object_or_404(Record, id=record_id)
+
+        def apply_default(field_value):
+            return field_value.strip() if field_value.strip() else "Não Informado"
+
+        record.ro = 'ro' in request.POST
+        record.ri = 'ri' in request.POST
+        record.joint_operation = 'joint_operation' in request.POST
+        record.police_district = apply_default(request.POST.get('police_district', ""))
+        record.bopc = apply_default(request.POST.get('bopc', ""))
+        record.police_chief_qra = apply_default(request.POST.get('police_chief_qra', ""))
+                
+        incident_conclusion_time = request.POST.get('incident_conclusion_time')
+        if incident_conclusion_time:
+            record.incident_conclusion_time = timezone.datetime.strptime(incident_conclusion_time, '%Y-%m-%dT%H:%M')
+                
+        record.officer_in_charge = apply_default(request.POST.get('officer_in_charge', ""))
+
+        notification_time = request.POST.get('incident_conclusion_time')
+        if notification_time:
+            record.notification_time = timezone.datetime.strptime(notification_time, '%Y-%m-%dT%H:%M')
+                
+        record.officer_in_charge_actions = apply_default(request.POST.get('officer_in_charge_actions', ""))
+        record.is_finished = True
+        record.finished_by = request.user
+        record.save()
+
+    return redirect('user_area')
+
+
+
 ########################################################################## CONSULTAS
 @login_required
 def today_records(request):
@@ -268,7 +309,7 @@ def today_records(request):
 
 @login_required
 def all_records(request):
-    records = Record.objects.all()
+    records = Record.objects.filter(is_finished=True)
     return render(request, 'all_records.html', {'records': records})
 
 
