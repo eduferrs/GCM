@@ -11,6 +11,10 @@ As principais tecnologias utilizadas são os frameworks Django (5.1.2) e Bootstr
      - python3 manage.py makemigrations
      - python3 manage.py migrate
      - python3 manage.py createsuperuser
+     - python3 manage.py shell
+     - from report.scripts.populate_incident_types import populate_incident_types
+     - populate_incident_types()
+     - quit()
      - python3 manage.py runserver
 - No navegador, acesse o endereço http://127.0.0.1:8000/
 - Ao terminar de utilizar, aperte Ctrl + C no terminal e execute o comando deactivate
@@ -26,6 +30,10 @@ As principais tecnologias utilizadas são os frameworks Django (5.1.2) e Bootstr
 	- python manage.py makemigrations
 	- python manage.py migrate
 	- python manage.py createsuperuser
+ 	- python manage.py shell
+ 	- from report.scripts.populate_incident_types import populate_incident_types
+  	- populate_incident_types()
+  	- quit()
 	- python manage.py runserver
 - No navegador, acesse o endereço http://127.0.0.1:8000/
 - Ao terminar de utilizar, aperte Ctrl + C no terminal e execute o comando deactivate
