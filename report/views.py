@@ -322,22 +322,77 @@ def export_records_csv(request):
     writer = csv.writer(response)
     
     writer.writerow([       #cabeçalho
+        'id',
+        'data_hora_fato',
+        'data_chamada',
+        'termino_ocorrencia',
+
         'solicitante',
-        'telefone',
+        'telefone_solicitante',
         'cep_do_solicitante',
         'bairro_do_solicitante',
         'rua_do_solicitante',
         'numero_casa_do_solicitante',
         'parte_da_ocorrencia',
         'esperando_no_local',
-        'data_hora_fato',
-        'data_chamada',
-        'plantonista'])
+
+        'cep_ocorrencia',
+        'bairro_ocorrencia',
+        'rua_ocorrencia',
+        'numero_casa_da_ocorrencia',
+        'ponto_referencia',
+
+        'cor_pele_suspeito',
+        'cabelo_suspeito',
+        'tatuagens_suspeito',
+        'idade_suspeito',
+        'altura_suspeito',
+        'outras_caracteristicas_suspeito',
+
+        'natureza_ocorrencia',
+        'tipo_ocorrencia',
+        'arma_de_fogo',
+        'crianca_envolvida',
+        'quantidade_envolvidos',
+
+        'veiculo',
+        'modelo_veiculo',
+        'cor_veiculo',
+        'tipo_veiculo',
+        'vitimas',
+        'precisa_ambulancia',
+        'prioridade_atendimento',
+
+        'despacho_vtr',
+        'equipe_resposta',
+
+        'ro',
+        'ri',
+        'operacao_conjunta',
+        'distrito_policial',
+        'n_bopc',
+        'qra_delegado',
+        'plantonista',
+        're_plantonista',
+        'responsavel_plantao',
+        'hora_comunicado_responsavel',
+        'providencias_adotadas'])
     
 
-    for record in Record.objects.all():
+    for record in Record.objects.filter(is_finished=True):
         record.is_caller_part_of = 'Sim' if record.is_caller_part_of else 'Não'
         record.is_caller_wating = 'Sim' if record.is_caller_wating else 'Não'
+
+        record.is_there_a_firearm = 'Sim' if record.is_there_a_firearm else 'Não'
+        record.child_involved = 'Sim' if record.child_involved else 'Não'
+
+        record.are_there_victims = 'Sim' if record.are_there_victims else 'Não'
+        record.ambulance_required = 'Sim' if record.ambulance_required else 'Não'
+        record.priority_incident = 'Sim' if record.priority_incident else 'Não'
+
+        record.ro = 'Sim' if record.ro else 'Não'
+        record.ri = 'Sim' if record.ri else 'Não'
+        record.joint_operation = 'Sim' if record.joint_operation else 'Não'
 
         ###Formatação das datas
         if record.fact_date:
@@ -349,10 +404,25 @@ def export_records_csv(request):
             call_date = record.call_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
         else:
             call_date = ''
+
+        if record.incident_conclusion_time:
+            incident_conclusion_time = record.incident_conclusion_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            incident_conclusion_time = ''
+
+        if record.notification_time:
+            notification_time = record.notification_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            notification_time = ''
         
         plantonista = f"{record.user.first_name} {record.user.last_name}" if record.user else ''
 
         writer.writerow([
+            record.id,
+            fact_date,
+            call_date,
+            incident_conclusion_time,
+
             record.caller_name,
             record.caller_phone,
             record.caller_zip_code,
@@ -361,9 +431,48 @@ def export_records_csv(request):
             record.caller_house_number,
             record.is_caller_part_of,
             record.is_caller_wating,
-            fact_date,
-            call_date,
-            plantonista])
+
+            record.incident_zip_code,
+            record.incident_neighborhood,
+            record.incident_street,
+            record.incident_house_number,
+            record.reference_point,
+
+            record.suspect_skin_color,
+            record.suspect_haircut_style,
+            record.suspect_tatoos,
+            record.suspect_approximate_age,
+            record.suspect_approximate_height,
+            record.suspect_description,
+            
+            record.nature_of_the_incident,
+            record.type_of_incident,
+            record.is_there_a_firearm,
+            record.child_involved,
+            record.number_of_people_involved,
+
+            record.vehicle,
+            record.vehicle_model,
+            record.vehicle_color,
+            record.vehicle_type,
+            record.are_there_victims,
+            record.ambulance_required,
+            record.priority_incident,
+
+            record.incident_dispatch_VTR,
+            record.response_team,
+
+            record.ro,
+            record.ri,
+            record.joint_operation,
+            record.police_district,
+            record.bopc,
+            record.police_chief_qra,
+            plantonista,
+            record.user.profile.re,
+            record.officer_in_charge,
+            notification_time,
+            record.officer_in_charge_actions])
     return response
 
 
@@ -377,22 +486,78 @@ def export_records_excel(request):
     sheet.title = 'Registros'
     
     sheet.append([          #cabeçalho
+        'id',
+        'data_hora_fato',
+        'data_chamada',
+        'termino_ocorrencia',
+
         'solicitante',
-        'telefone',
+        'telefone_solicitante',
         'cep_do_solicitante',
         'bairro_do_solicitante',
         'rua_do_solicitante',
         'numero_casa_do_solicitante',
         'parte_da_ocorrencia',
         'esperando_no_local',
-        'data_hora_fato',
-        'data_chamada',
-        'plantonista'])
+
+        'cep_ocorrencia',
+        'bairro_ocorrencia',
+        'rua_ocorrencia',
+        'numero_casa_da_ocorrencia',
+        'ponto_referencia',
+
+        'cor_pele_suspeito',
+        'cabelo_suspeito',
+        'tatuagens_suspeito',
+        'idade_suspeito',
+        'altura_suspeito',
+        'outras_caracteristicas_suspeito',
+
+        'natureza_ocorrencia',
+        'tipo_ocorrencia',
+        'arma_de_fogo',
+        'crianca_envolvida',
+        'quantidade_envolvidos',
+
+        'veiculo',
+        'modelo_veiculo',
+        'cor_veiculo',
+        'tipo_veiculo',
+        'vitimas',
+        'precisa_ambulancia',
+        'prioridade_atendimento',
+
+        'despacho_vtr',
+        'equipe_resposta',
+
+        'ro',
+        'ri',
+        'operacao_conjunta',
+        'distrito_policial',
+        'n_bopc',
+        'qra_delegado',
+        'plantonista',
+        're_plantonista',
+        'responsavel_plantao',
+        'hora_comunicado_responsavel',
+        'porvidencias_adotadas'])
     
-    for record in Record.objects.all():
+    for record in Record.objects.filter(is_finished=True):
 
         record.is_caller_part_of = 'Sim' if record.is_caller_part_of else 'Não'
         record.is_caller_wating = 'Sim' if record.is_caller_wating else 'Não'
+
+        record.is_there_a_firearm = 'Sim' if record.is_there_a_firearm else 'Não'
+        record.child_involved = 'Sim' if record.child_involved else 'Não'
+
+        record.are_there_victims = 'Sim' if record.are_there_victims else 'Não'
+        record.ambulance_required = 'Sim' if record.ambulance_required else 'Não'
+        record.priority_incident = 'Sim' if record.priority_incident else 'Não'
+
+        record.ro = 'Sim' if record.ro else 'Não'
+        record.ri = 'Sim' if record.ri else 'Não'
+        record.joint_operation = 'Sim' if record.joint_operation else 'Não'
+        
 
         ###Formatação das datas
         #replace(tzinfo=None) é para remoção do fuso horário.
@@ -405,10 +570,25 @@ def export_records_excel(request):
             call_date = record.call_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
         else:
             call_date = ''
+        
+        if record.incident_conclusion_time:
+            incident_conclusion_time = record.incident_conclusion_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            incident_conclusion_time = ''
+
+        if record.notification_time:
+            notification_time = record.notification_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            notification_time = ''
     
         plantonista = f"{record.user.first_name} {record.user.last_name}" if record.user else ''
 
         sheet.append([
+            record.id,
+            fact_date,
+            call_date,
+            incident_conclusion_time,
+
             record.caller_name,
             record.caller_phone,
             record.caller_zip_code,
@@ -417,9 +597,380 @@ def export_records_excel(request):
             record.caller_house_number,
             record.is_caller_part_of,
             record.is_caller_wating,
+
+            record.incident_zip_code,
+            record.incident_neighborhood,
+            record.incident_street,
+            record.incident_house_number,
+            record.reference_point,
+
+            record.suspect_skin_color,
+            record.suspect_haircut_style,
+            record.suspect_tatoos,
+            record.suspect_approximate_age,
+            record.suspect_approximate_height,
+            record.suspect_description,
+            
+            record.nature_of_the_incident,
+            record.type_of_incident,
+            record.is_there_a_firearm,
+            record.child_involved,
+            record.number_of_people_involved,
+
+            record.vehicle,
+            record.vehicle_model,
+            record.vehicle_color,
+            record.vehicle_type,
+            record.are_there_victims,
+            record.ambulance_required,
+            record.priority_incident,
+
+            record.incident_dispatch_VTR,
+            record.response_team,
+
+            record.ro,
+            record.ri,
+            record.joint_operation,
+            record.police_district,
+            record.bopc,
+            record.police_chief_qra,
+            plantonista,
+            record.user.profile.re,
+            record.officer_in_charge,
+            notification_time,
+            record.officer_in_charge_actions])
+
+    workbook.save(response)
+    return response
+
+
+
+@login_required
+def export_today_records_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="registros_gcm.csv"'
+    
+    writer = csv.writer(response)
+    
+    writer.writerow([       #cabeçalho
+        'id',
+        'data_hora_fato',
+        'data_chamada',
+        'termino_ocorrencia',
+
+        'solicitante',
+        'telefone_solicitante',
+        'cep_do_solicitante',
+        'bairro_do_solicitante',
+        'rua_do_solicitante',
+        'numero_casa_do_solicitante',
+        'parte_da_ocorrencia',
+        'esperando_no_local',
+
+        'cep_ocorrencia',
+        'bairro_ocorrencia',
+        'rua_ocorrencia',
+        'numero_casa_da_ocorrencia',
+        'ponto_referencia',
+
+        'cor_pele_suspeito',
+        'cabelo_suspeito',
+        'tatuagens_suspeito',
+        'idade_suspeito',
+        'altura_suspeito',
+        'outras_caracteristicas_suspeito',
+
+        'natureza_ocorrencia',
+        'tipo_ocorrencia',
+        'arma_de_fogo',
+        'crianca_envolvida',
+        'quantidade_envolvidos',
+
+        'veiculo',
+        'modelo_veiculo',
+        'cor_veiculo',
+        'tipo_veiculo',
+        'vitimas',
+        'precisa_ambulancia',
+        'prioridade_atendimento',
+
+        'despacho_vtr',
+        'equipe_resposta',
+
+        'ro',
+        'ri',
+        'operacao_conjunta',
+        'distrito_policial',
+        'n_bopc',
+        'qra_delegado',
+        'plantonista',
+        're_plantonista',
+        'responsavel_plantao',
+        'hora_comunicado_responsavel',
+        'providencias_adotadas'])
+    
+    today = timezone.localtime(timezone.now()).date()
+    for record in Record.objects.filter(call_date__date=today):
+        record.is_caller_part_of = 'Sim' if record.is_caller_part_of else 'Não'
+        record.is_caller_wating = 'Sim' if record.is_caller_wating else 'Não'
+
+        record.is_there_a_firearm = 'Sim' if record.is_there_a_firearm else 'Não'
+        record.child_involved = 'Sim' if record.child_involved else 'Não'
+
+        record.are_there_victims = 'Sim' if record.are_there_victims else 'Não'
+        record.ambulance_required = 'Sim' if record.ambulance_required else 'Não'
+        record.priority_incident = 'Sim' if record.priority_incident else 'Não'
+
+        record.ro = 'Sim' if record.ro else 'Não'
+        record.ri = 'Sim' if record.ri else 'Não'
+        record.joint_operation = 'Sim' if record.joint_operation else 'Não'
+
+        ###Formatação das datas
+        if record.fact_date:
+            fact_date = record.fact_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            fact_date = ''
+        
+        if record.call_date:
+            call_date = record.call_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            call_date = ''
+
+        if record.incident_conclusion_time:
+            incident_conclusion_time = record.incident_conclusion_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            incident_conclusion_time = ''
+
+        if record.notification_time:
+            notification_time = record.notification_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            notification_time = ''
+        
+        plantonista = f"{record.user.first_name} {record.user.last_name}" if record.user else ''
+
+        writer.writerow([
+            record.id,
             fact_date,
             call_date,
-            plantonista])
+            incident_conclusion_time,
+
+            record.caller_name,
+            record.caller_phone,
+            record.caller_zip_code,
+            record.caller_neighborhood,
+            record.caller_street,
+            record.caller_house_number,
+            record.is_caller_part_of,
+            record.is_caller_wating,
+
+            record.incident_zip_code,
+            record.incident_neighborhood,
+            record.incident_street,
+            record.incident_house_number,
+            record.reference_point,
+
+            record.suspect_skin_color,
+            record.suspect_haircut_style,
+            record.suspect_tatoos,
+            record.suspect_approximate_age,
+            record.suspect_approximate_height,
+            record.suspect_description,
+            
+            record.nature_of_the_incident,
+            record.type_of_incident,
+            record.is_there_a_firearm,
+            record.child_involved,
+            record.number_of_people_involved,
+
+            record.vehicle,
+            record.vehicle_model,
+            record.vehicle_color,
+            record.vehicle_type,
+            record.are_there_victims,
+            record.ambulance_required,
+            record.priority_incident,
+
+            record.incident_dispatch_VTR,
+            record.response_team,
+
+            record.ro,
+            record.ri,
+            record.joint_operation,
+            record.police_district,
+            record.bopc,
+            record.police_chief_qra,
+            plantonista,
+            record.user.profile.re,
+            record.officer_in_charge,
+            notification_time,
+            record.officer_in_charge_actions])
+    return response
+
+
+@login_required
+def export_today_records_excel(request):
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="registros_gcm.xlsx"'
+    
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = 'Registros'
+    
+    sheet.append([          #cabeçalho
+        'id',
+        'data_hora_fato',
+        'data_chamada',
+        'termino_ocorrencia',
+
+        'solicitante',
+        'telefone_solicitante',
+        'cep_do_solicitante',
+        'bairro_do_solicitante',
+        'rua_do_solicitante',
+        'numero_casa_do_solicitante',
+        'parte_da_ocorrencia',
+        'esperando_no_local',
+
+        'cep_ocorrencia',
+        'bairro_ocorrencia',
+        'rua_ocorrencia',
+        'numero_casa_da_ocorrencia',
+        'ponto_referencia',
+
+        'cor_pele_suspeito',
+        'cabelo_suspeito',
+        'tatuagens_suspeito',
+        'idade_suspeito',
+        'altura_suspeito',
+        'outras_caracteristicas_suspeito',
+
+        'natureza_ocorrencia',
+        'tipo_ocorrencia',
+        'arma_de_fogo',
+        'crianca_envolvida',
+        'quantidade_envolvidos',
+
+        'veiculo',
+        'modelo_veiculo',
+        'cor_veiculo',
+        'tipo_veiculo',
+        'vitimas',
+        'precisa_ambulancia',
+        'prioridade_atendimento',
+
+        'despacho_vtr',
+        'equipe_resposta',
+
+        'ro',
+        'ri',
+        'operacao_conjunta',
+        'distrito_policial',
+        'n_bopc',
+        'qra_delegado',
+        'plantonista',
+        're_plantonista',
+        'responsavel_plantao',
+        'hora_comunicado_responsavel',
+        'porvidencias_adotadas'])
+    
+    today = timezone.localtime(timezone.now()).date()
+    for record in Record.objects.filter(call_date__date=today):
+
+        record.is_caller_part_of = 'Sim' if record.is_caller_part_of else 'Não'
+        record.is_caller_wating = 'Sim' if record.is_caller_wating else 'Não'
+
+        record.is_there_a_firearm = 'Sim' if record.is_there_a_firearm else 'Não'
+        record.child_involved = 'Sim' if record.child_involved else 'Não'
+
+        record.are_there_victims = 'Sim' if record.are_there_victims else 'Não'
+        record.ambulance_required = 'Sim' if record.ambulance_required else 'Não'
+        record.priority_incident = 'Sim' if record.priority_incident else 'Não'
+
+        record.ro = 'Sim' if record.ro else 'Não'
+        record.ri = 'Sim' if record.ri else 'Não'
+        record.joint_operation = 'Sim' if record.joint_operation else 'Não'
+        
+
+        ###Formatação das datas
+        #replace(tzinfo=None) é para remoção do fuso horário.
+        if record.fact_date:
+            fact_date = record.fact_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            fact_date = ''
+        
+        if record.call_date:
+            call_date = record.call_date.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            call_date = ''
+        
+        if record.incident_conclusion_time:
+            incident_conclusion_time = record.incident_conclusion_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            incident_conclusion_time = ''
+
+        if record.notification_time:
+            notification_time = record.notification_time.replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        else:
+            notification_time = ''
+    
+        plantonista = f"{record.user.first_name} {record.user.last_name}" if record.user else ''
+
+        sheet.append([
+            record.id,
+            fact_date,
+            call_date,
+            incident_conclusion_time,
+
+            record.caller_name,
+            record.caller_phone,
+            record.caller_zip_code,
+            record.caller_neighborhood,
+            record.caller_street,
+            record.caller_house_number,
+            record.is_caller_part_of,
+            record.is_caller_wating,
+
+            record.incident_zip_code,
+            record.incident_neighborhood,
+            record.incident_street,
+            record.incident_house_number,
+            record.reference_point,
+
+            record.suspect_skin_color,
+            record.suspect_haircut_style,
+            record.suspect_tatoos,
+            record.suspect_approximate_age,
+            record.suspect_approximate_height,
+            record.suspect_description,
+            
+            record.nature_of_the_incident,
+            record.type_of_incident,
+            record.is_there_a_firearm,
+            record.child_involved,
+            record.number_of_people_involved,
+
+            record.vehicle,
+            record.vehicle_model,
+            record.vehicle_color,
+            record.vehicle_type,
+            record.are_there_victims,
+            record.ambulance_required,
+            record.priority_incident,
+
+            record.incident_dispatch_VTR,
+            record.response_team,
+
+            record.ro,
+            record.ri,
+            record.joint_operation,
+            record.police_district,
+            record.bopc,
+            record.police_chief_qra,
+            plantonista,
+            record.user.profile.re,
+            record.officer_in_charge,
+            notification_time,
+            record.officer_in_charge_actions])
 
     workbook.save(response)
     return response

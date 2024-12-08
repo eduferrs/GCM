@@ -36,6 +36,8 @@ urlpatterns = [
 
     path('export/csv/', export_records_csv, name='export_records_csv'),
     path('export/excel/', export_records_excel, name='export_records_excel'),
+    path('export2/csv/', export_today_records_csv, name='export_today_records_csv'),
+    path('export2/excel/', export_today_records_excel, name='export_today_records_excel'),
     
     
 ]
